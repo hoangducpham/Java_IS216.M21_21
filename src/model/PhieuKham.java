@@ -5,18 +5,17 @@ import java.util.Date;
 
 public class PhieuKham {
     private int MaPK;
-    private int MaPhong;
     private int MaBN;
+    private String liDoKham;
     private String NgayKham;
 
     public PhieuKham() {
     }
 
-    public PhieuKham(int MaPK, int MaPhong, int MaBN, String NgayKham) {
+    public PhieuKham(int MaPK, int MaBN, String liDoKham, String NgayKham) {
         this.MaPK = MaPK;
-        this.MaPhong = MaPhong;
         this.MaBN = MaBN;
-        this.NgayKham = NgayKham;
+        this.liDoKham = liDoKham;
     }
 
     public int getMaPK() {
@@ -27,20 +26,20 @@ public class PhieuKham {
         this.MaPK = MaPK;
     }
 
-    public int getMaPhong() {
-        return MaPhong;
-    }
-
-    public void setMaPhong(int MaPhong) {
-        this.MaPhong = MaPhong;
-    }
-
     public int getMaBN() {
         return MaBN;
     }
 
     public void setMaBN(int MaBN) {
         this.MaBN = MaBN;
+    }
+
+    public String getLiDoKham() {
+        return liDoKham;
+    }
+
+    public void setLiDoKham(String liDoKham) {
+        this.liDoKham = liDoKham;
     }
 
     public String getNgayKham() {
@@ -51,6 +50,9 @@ public class PhieuKham {
         this.NgayKham = NgayKham;
     }
     
+    
+    
+
 }
 
 

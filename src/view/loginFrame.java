@@ -44,7 +44,6 @@ public class loginFrame extends javax.swing.JFrame {
     public int checkLogIn(){
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            //Connection conn= DriverManager.getConnection(url,"DOAN_ORACLE","admin");
             Connection conn = DriverManager.getConnection(url, "DOAN_ORACLE","admin");
             String query1="SELECT USERNAME, PASSWORD FROM NHANVIEN";
             Statement stm=conn.createStatement();
@@ -52,12 +51,11 @@ public class loginFrame extends javax.swing.JFrame {
             while(rs.next()){
                 String username=rs.getString("USERNAME");
                 String password=rs.getString("PASSWORD");
-                if(username.equals(txtUsername.getText().toString()) /*&& password.equals(txtPassword.getText().toString())==true*/){
+                if(username.equals(txtUsername.getText().toString())){
                     return 1;
                 }
             }
             return 0;
-            //conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             return 0;
