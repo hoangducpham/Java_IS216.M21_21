@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" pageWidth="400" pageHeight="300" orientation="Landscape" columnWidth="360" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cf5a34fc-5c10-4398-ba6a-ffde97ef1103">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="tenBN" class="java.lang.String"/>
+	<parameter name="maBN" class="java.lang.String"/>
+	<parameter name="LiDo" class="java.lang.String"/>
+	<parameter name="maPK" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select * from HOADON]]>
+	</queryString>
+	<field name="MAHD" class="java.math.BigDecimal"/>
+	<field name="MABN" class="java.math.BigDecimal"/>
+	<field name="TRIEUCHUNG" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="106" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="153" height="25" uuid="e4a35675-a6d0-47ef-8662-fd638e380c5f"/>
+				<textElement>
+					<font fontName="Arial" size="16"/>
+				</textElement>
+				<text><![CDATA[Phòng mạch tư ABC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="25" width="153" height="20" uuid="fba86477-5249-478b-bc77-a5962b7b81fb"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<text><![CDATA[SĐT: 0123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="97" y="58" width="162" height="35" uuid="b41abec5-75b1-4825-8e69-001ac2d4dcd7"/>
+				<textElement>
+					<font fontName="Arial" size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PHIẾU KHÁM]]></text>
+			</staticText>
+			<line>
+				<reportElement x="130" y="92" width="100" height="1" uuid="29703712-8110-44f0-9ed5-f75db72b362e"/>
+			</line>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="23" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="249" y="0" width="110" height="20" uuid="597b8778-9458-4e28-97ec-8493ac2d9975"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="83" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="114" height="20" uuid="ddf05086-7a93-4880-87a3-231e29fee33f"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mã phiếu khám:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="114" height="20" uuid="f4288396-46ae-4424-b312-962071b9bcd7"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mã bệnh nhân:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="114" height="20" uuid="9c434c1f-0c12-4a64-9d7c-43be182ee1c5"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tên bệnh nhân:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="114" height="20" uuid="9e66fc35-859b-45bf-b799-7688d9ad5264"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lí do khám:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="114" y="40" width="100" height="20" uuid="3beb6c8a-090c-4d3e-8ada-4db81c248adc"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{tenBN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="114" y="60" width="100" height="20" uuid="7ed33a84-fb2b-4073-a429-494f77ad2439"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{LiDo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="114" y="20" width="100" height="20" uuid="8305f845-3528-4e28-aa77-7827ae536024"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{maBN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="114" y="0" width="100" height="20" uuid="18b686be-265a-4c51-a691-1571b765906a"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{maPK}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="2" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="3" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="6" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

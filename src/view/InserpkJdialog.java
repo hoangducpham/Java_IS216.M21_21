@@ -1,5 +1,6 @@
 package view;
 
+import com.fasterxml.jackson.databind.type.MapLikeType;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -11,16 +12,31 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import model.BenhNhan;
 import model.PhieuKham;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRReport;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
+
 public class InserpkJdialog extends javax.swing.JDialog {
 
-    private Connection conn;
+    
     private BaseFrame home;
+    private int maPK=0;
+    private Connection conn;
     public InserpkJdialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -28,83 +44,101 @@ public class InserpkJdialog extends javax.swing.JDialog {
         home = (BaseFrame) parent;
         this.setTitle("Nhập thông tin phiếu khám");
         this.setLocationRelativeTo(null);
+        setMaPK();
         txtMaPK.setEditable(false);
+        txtMaPK.setText(maPK+"");
         txtMaBN.setEditable(false);
-        TangMaPKTuDong();
+        txtMaBN.setText(home.getMaBN()+"");
+        
     }
 
-    ArrayList<PhieuKham> listPK = getPhieuKhamList(); 
-        
-    public ArrayList<PhieuKham> getPhieuKhamList(){
-        ArrayList<PhieuKham> PhieuKhamsList = new ArrayList<>();
-        String url = "jdbc:oracle:thin:@localhost:1521:orcl";
-        try{
-            conn = DriverManager.getConnection(url,"DOAN_ORACLE","admin");
-            String query2 = "SELECT * FROM PHIEUKHAM";
-            Statement stm = conn.createStatement();
-            ResultSet rs = stm.executeQuery(query2);
-            PhieuKham pk;
-            while(rs.next()){          
-                java.sql.Date ngayKham = rs.getDate("NGAYKHAM");
-                DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");  
-                String NgayKham = dateFormat.format(ngayKham); 
-                pk = new PhieuKham(rs.getInt("MAPK"),rs.getInt("MABN"), rs.getString("LIDOKHAM"), rs.getString("NGAYKHAM"));
-                PhieuKhamsList.add(pk);
+    public void connect(){
+        try {
+            String url="jdbc:oracle:thin:@localhost:1521:orcl";
+            conn=DriverManager.getConnection(url,"DOAN_ORACLE","admin");
+        } catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void setMaPK(){
+        try {
+            connect();
+            String query = "SELECT GET_MAHD FROM DUAL";
+            Statement stm=conn.createStatement();
+            ResultSet rs=stm.executeQuery(query);
+            while(rs.next()){
+                maPK=rs.getInt(1);
             }
             conn.close();
-        }catch(SQLException e){
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return PhieuKhamsList;
     }
     
-    
-    public void TangMaPKTuDong(){
-        // xét id tăng tự động
-        txtMaPK.setEditable(false);
-        int id = 1;
-        boolean flag;
-        while(true){
-            flag = false;
-            for(PhieuKham pk: listPK){
-                if(id == pk.getMaPK()){
-                    flag = true;
-                    break;
-                }
-            }
-            if(!flag) break;
-            ++id;
-        }
-        txtMaPK.setText(id+"");
-    }
+
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         txtMaPK = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
         txtMaBN = new javax.swing.JTextField();
-        btThem = new javax.swing.JButton();
-        btThoat = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         txtLiDoKham = new javax.swing.JTextField();
+        btThem = new javax.swing.JButton();
+        btThoat = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setModal(true);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
-        jLabel1.setText("NHẬP THÔNG TIN PHIẾU KHÁM");
+        jPanel1.setBackground(new java.awt.Color(69, 123, 179));
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("THÔNG TIN PHIẾU KHÁM");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBackground(new java.awt.Color(204, 204, 255));
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setText("Mã phiếu khám");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        txtMaPK.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel4.setText("Mã bệnh nhân");
 
-        btThem.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        txtMaBN.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel6.setText("Lí do khám");
+
+        txtLiDoKham.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+
+        btThem.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btThem.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\add-icon.png")); // NOI18N
         btThem.setText("Thêm");
         btThem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -112,7 +146,8 @@ public class InserpkJdialog extends javax.swing.JDialog {
             }
         });
 
-        btThoat.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        btThoat.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        btThoat.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\Exit-icon.png")); // NOI18N
         btThoat.setText("Thoát");
         btThoat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -120,61 +155,69 @@ public class InserpkJdialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel6.setText("Lí do khám");
-
-        txtLiDoKham.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtMaPK, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                            .addComponent(btThem)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btThoat))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(32, 32, 32)
+                            .addComponent(txtLiDoKham, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4)))
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(txtMaPK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtLiDoKham, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btThem)
+                    .addComponent(btThoat))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel4))
-                        .addGap(40, 40, 40)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtMaBN, javax.swing.GroupLayout.DEFAULT_SIZE, 148, Short.MAX_VALUE)
-                            .addComponent(txtMaPK)
-                            .addComponent(txtLiDoKham)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(126, 126, 126)
-                        .addComponent(btThem)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btThoat))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)))
-                .addContainerGap(18, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(10, 10, 10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtMaPK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(txtLiDoKham, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(35, 35, 35)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btThem)
-                    .addComponent(btThoat))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -185,55 +228,71 @@ public class InserpkJdialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btThoatActionPerformed
 
     private void btThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btThemActionPerformed
-        int MaPK=0;
         String liDoKham=txtLiDoKham.getText();
-        int MaBN = 0;
-        boolean flag = true;
-        
         if(txtMaPK.getText().equals("")||txtMaBN.getText().equals("")||txtLiDoKham.getText().equals("")){
             JOptionPane.showMessageDialog(this, "Bạn hãy điền đầy đủ thông tin");
         }
         else{
             try {
-                MaBN = Integer.parseInt(txtMaBN.getText());
                 java.util.Date today = new java.util.Date();
                 DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
                 String ngayKham = dateFormat.format(today);
                 java.util.Date date2 = new SimpleDateFormat("MMM d, yyyy").parse(ngayKham);
                 java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
                 
-                if(flag == true){
-                    PhieuKham pk = new PhieuKham(MaPK,MaBN,liDoKham,today.toString());                    
-                    JOptionPane.showMessageDialog(this, "Thêm thành công");
-                }
-                    
-                String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+                connect();
                 try {
-                    conn = DriverManager.getConnection(url,"DOAN_ORACLE","admin");
-                    String insert = "insert into PHIEUKHAM values(?,?,?,?)";
+                    conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+                } catch (SQLException ex) {
+                    Logger.getLogger(InserpkJdialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                try {
+                    String insert = "insert into HOADON values(?,?,?,?,?,?,?,?,?)";
                     PreparedStatement st = conn.prepareStatement(insert);
-                    st.setInt(1, MaPK);
-                    st.setInt(2, MaBN);
-                    st.setString(3, liDoKham);
-                    st.setDate(4, sqlDate);
+                    st.setInt(1, maPK);
+                    st.setInt(2, home.getMaBN());
+                    st.setInt(3, 0);
+                    st.setString(4, liDoKham);
+                    st.setString(5, "");
+                    st.setString(6, "");
+                    st.setInt(7, 30000);
+                    st.setInt(8, 30000);
+                    st.setDate(9, sqlDate);
                     
                     int x = st.executeUpdate();
                     if(x > 0){
-                        JOptionPane.showMessageDialog(this, "Thêm thành công " +x+ " dòng");
+                        JOptionPane.showMessageDialog(this, "Thêm phiếu khám thành công ");
                     }else{
                         JOptionPane.showMessageDialog(this, "Không thêm được vào dữ liệu");
                     }
-                    TangMaPKTuDong();
-                    txtMaBN.setText("");
+                    
+                String tenBN = "";
+                String sql = "Select HOTEN From BENHNHAN Where MABN="+txtMaBN.getText();
+                Statement stm = conn.createStatement();
+                ResultSet rs = stm.executeQuery(sql);
+                while(rs.next()){
+                    tenBN = rs.getString(1);
+                }
+                try{
+                    Map<String, Object> parameters = new HashMap<String, Object>();
+                    JasperDesign jdesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\report2.jrxml");
+                    parameters.put("maPK", txtMaPK.getText());
+                    parameters.put("maBN", txtMaBN.getText());
+                    parameters.put("LiDo", txtLiDoKham.getText());
+                    parameters.put("tenBN", tenBN);
+
+                    JasperReport jreport = JasperCompileManager.compileReport(jdesign);
+                    JasperPrint jprint = JasperFillManager.fillReport(jreport, parameters, conn);
+                    JasperViewer.viewReport(jprint, false);
+                    conn.close();
+                } catch (Exception ex) {
+                    Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 }catch (SQLException ex) {
                     Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
             }catch (ParseException ex) {
                 Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }catch (Exception e) {
-                JOptionPane.showMessageDialog(rootPane, "Mã bệnh nhân phải là số và không chứa kí tự khác");
-                flag = false;    
             }
             this.dispose();
         }  
@@ -287,6 +346,8 @@ public class InserpkJdialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField txtLiDoKham;
     private javax.swing.JTextField txtMaBN;
     private javax.swing.JTextField txtMaPK;

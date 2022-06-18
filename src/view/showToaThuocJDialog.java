@@ -6,6 +6,7 @@
 package view;
 
 import java.sql.Statement;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -19,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.NhanVien;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 /**
  *
  * @author Admin
@@ -60,12 +62,43 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
                 txtTinhTrang.setText("Đã lấy");
             }
             
+            int tienthuoc=0;
+            String query2="select SUM(THANHTIEN) FROM TOATHUOC WHERE MAHD="+mahd;
+            java.sql.Statement stm1 = conn.createStatement();
+            ResultSet rs1 = stm1.executeQuery(query2);
+            while(rs1.next()){
+                tienthuoc=rs1.getInt(1);
+            }
+            txtTienThuoc.setText(rutGonDoanhThu(tienthuoc)+" VNĐ");
+            
             conn.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(rootPane, "Lỗi lấy dữ liệu toa thuốc");
         }
     }
     
+        public String rutGonDoanhThu(long money){
+        ArrayList<String> arr=new ArrayList<>();
+        while(money>999){
+            long temp=money%1000;
+            money/=1000;
+            if(temp==0){
+                arr.add(String.valueOf(temp)+"00");
+            }else if(temp<=9){
+                arr.add("00"+String.valueOf(temp));
+            }else if(temp<=99){
+                arr.add("0"+String.valueOf(temp));
+            }else 
+                arr.add(String.valueOf(temp));
+        }
+        arr.add(String.valueOf(money));
+        String tien=" ";
+        for(int j=arr.size()-1; j>0; j--){
+            tien=tien+arr.get(j)+".";
+        }
+        tien=tien+arr.get(0);
+        return tien;
+    }
     
     public void showToaThuocInfo(){
         inputTable();
@@ -80,6 +113,7 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
         initComponents();
         home=(BaseFrame) parent;
         showToaThuocInfo();
+        
     }
 
     /**
@@ -104,12 +138,13 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
         txtTinhTrang = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtTienThuoc = new javax.swing.JTextField();
+        btThoat = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel2.setBackground(new java.awt.Color(69, 123, 179));
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 32)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("TOA THUỐC");
 
@@ -118,25 +153,26 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(140, 140, 140)
+                .addGap(161, 161, 161)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(22, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
-        jPanel3.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel3.setBackground(new java.awt.Color(204, 204, 255));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setText("Mã hóa đơn");
 
         txtMaHD.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
+        tblToaThuoc.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         tblToaThuoc.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -172,6 +208,15 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
 
         txtTienThuoc.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
+        btThoat.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        btThoat.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\Exit-icon.png")); // NOI18N
+        btThoat.setText("THOÁT");
+        btThoat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btThoatActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -179,14 +224,14 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 271, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtTienThuoc))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtTienThuoc, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
                             .addComponent(btNhanThuoc)
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel3)
@@ -195,14 +240,16 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtMaHD, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 8, Short.MAX_VALUE)))
+                                .addComponent(txtMaHD, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btThoat)))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(30, 30, 30)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -217,7 +264,9 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
                             .addComponent(jLabel4)
                             .addComponent(txtTienThuoc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(23, 23, 23)
-                        .addComponent(btNhanThuoc))
+                        .addComponent(btNhanThuoc)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btThoat))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -248,23 +297,32 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 477, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 477, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btNhanThuocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNhanThuocActionPerformed
         try {
             // TODO add your handling code here:
             int mahd=home.getMaHoaDon();
-            String query="update TOATHUOC SET TINHTRANG=? WHERE MAHD=?";
             connect();
-            PreparedStatement pre=conn.prepareStatement(query);
-            pre.setInt(1, 1);
-            pre.setInt(2, mahd);
-            int x=pre.executeUpdate();
-            JOptionPane.showMessageDialog(rootPane, x+" dòng đã được cập nhật");
+            //Sử dụng cho đồ án Java 
+//            String query="update TOATHUOC SET TINHTRANG=? WHERE MAHD=?";
+//            PreparedStatement pre=conn.prepareStatement(query);
+//            pre.setInt(1, 1);
+//            pre.setInt(2, mahd);
+//            int x=pre.executeUpdate();
+//            JOptionPane.showMessageDialog(rootPane, x+" dòng đã được cập nhật");
+
+            //Sử dụng cho mô tả bất đồng thời oracle
+            String query="{call CAPNHATTINHTRANG(?)}";
+            CallableStatement castm = conn.prepareCall(query);
+            castm.setInt(1, mahd);
+            castm.execute();
+            
             conn.close();
             this.dispose();
         } catch (SQLException ex) {
@@ -272,6 +330,11 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
             Logger.getLogger(showToaThuocJDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btNhanThuocActionPerformed
+
+    private void btThoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btThoatActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+    }//GEN-LAST:event_btThoatActionPerformed
 
     /**
      * @param args the command line arguments
@@ -317,6 +380,7 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btNhanThuoc;
+    private javax.swing.JButton btThoat;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

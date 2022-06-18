@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="630" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a2545c1e-921b-46ad-be10-b5313e8b6edd">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="104"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#8FAFCC">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#CFDBE6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="145acc26-8e1b-4ef4-a1ed-f7535b7e21a1"/>
+	<subDataset name="Table Dataset 2" uuid="1125d781-3614-4a9a-a8a7-6aa36daeb8fd"/>
+	<parameter name="Nam" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT EXTRACT(MONTH FROM NGAYKHAM) AS "THÁNG", MAHD, THANHTIEN
+FROM HOADON
+WHERE EXTRACT(YEAR FROM NGAYKHAM)=$P{Nam}
+ORDER BY EXTRACT(MONTH FROM NGAYKHAM)]]>
+	</queryString>
+	<field name="THÁNG" class="java.math.BigDecimal"/>
+	<field name="MAHD" class="java.math.BigDecimal"/>
+	<field name="THANHTIEN" class="java.math.BigDecimal"/>
+	<variable name="THANHTIEN_1" class="java.math.BigDecimal" resetType="Group" resetGroup="REPORT_MONTH" calculation="Sum">
+		<variableExpression><![CDATA[$F{THANHTIEN}]]></variableExpression>
+	</variable>
+	<variable name="THANHTIEN_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{THANHTIEN}]]></variableExpression>
+	</variable>
+	<variable name="MAHD_1" class="java.lang.Integer" resetType="Group" resetGroup="REPORT_MONTH" calculation="Count">
+		<variableExpression><![CDATA[$F{MAHD}]]></variableExpression>
+	</variable>
+	<group name="REPORT_MONTH">
+		<groupExpression><![CDATA[$F{THÁNG}]]></groupExpression>
+		<groupHeader>
+			<band height="21">
+				<staticText>
+					<reportElement mode="Opaque" x="156" y="0" width="76" height="20" backcolor="#999999" uuid="1fbea4b4-b4c9-4f78-b729-e106cb2d6747"/>
+					<textElement textAlignment="Center">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[THÁNG]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="232" y="0" width="168" height="20" backcolor="#999999" uuid="28e2c210-97f1-4ac4-b610-c2323ac63c0d"/>
+					<textElement textAlignment="Center">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[SỐ LƯỢNG HÓA ĐƠN]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="61">
+				<textField>
+					<reportElement x="360" y="30" width="119" height="20" uuid="971b5fa3-1753-426c-8578-d42519f01620"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{THANHTIEN_1}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="144" y="29" width="303" height="1" uuid="b0721a89-1384-42da-ac26-c36d91cfca65"/>
+				</line>
+				<line>
+					<reportElement x="30" y="58" width="494" height="1" uuid="a44cc3b2-a639-4e60-8952-55ff643f8bf7"/>
+				</line>
+				<staticText>
+					<reportElement x="204" y="30" width="145" height="20" uuid="f8405735-ef14-4d24-bd7c-bda0da539fce"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<text><![CDATA[DOANH THU THÁNG]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="156" y="0" width="76" height="20" uuid="69a9f0b6-774c-46b7-adba-ca7f6252af4a"/>
+					<textElement textAlignment="Center">
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{THÁNG}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="232" y="0" width="168" height="20" uuid="6633fcc3-8472-4fcd-a8ac-ca9a42564185"/>
+					<textElement textAlignment="Center">
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{MAHD_1}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="135" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="25" width="153" height="20" uuid="b8eb50d2-7516-43e8-b3ac-359a15a7509e"/>
+				<textElement>
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<text><![CDATA[SĐT: 0123456789]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="153" height="25" uuid="ad818249-9686-4c01-852e-3348c51ed91e"/>
+				<textElement>
+					<font fontName="Arial" size="16"/>
+				</textElement>
+				<text><![CDATA[Phòng mạch tư ABC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="144" y="58" width="284" height="32" uuid="bbec8440-b9ed-4a19-9d00-c8113bf08dde"/>
+				<textElement textAlignment="Center">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[THỐNG KÊ DOANH THU]]></text>
+			</staticText>
+			<line>
+				<reportElement x="204" y="129" width="168" height="1" uuid="3cf695ee-ff5c-4720-9b5d-e27936ca34b6"/>
+			</line>
+			<staticText>
+				<reportElement x="227" y="90" width="62" height="39" uuid="43950a24-0c65-4a1e-aa1c-c77286cdb474"/>
+				<textElement>
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NĂM]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="289" y="90" width="111" height="39" uuid="0772dfaf-bb75-40b2-897a-0ad754ca836f"/>
+				<textElement>
+					<font size="24" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Nam}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="24" splitType="Stretch">
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="410" y="4" width="145" height="20" uuid="e0e5c8eb-24ca-4f36-a5c5-46163f494a58"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="6" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="1" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="149" splitType="Stretch">
+			<bar3DChart>
+				<chart>
+					<reportElement x="312" y="0" width="228" height="149" uuid="cd6f39d1-c221-4e2a-8a33-855ed83e57de"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{THÁNG}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{THÁNG}]]></categoryExpression>
+						<valueExpression><![CDATA[$V{THANHTIEN_1}]]></valueExpression>
+					</categorySeries>
+				</categoryDataset>
+				<bar3DPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</bar3DPlot>
+			</bar3DChart>
+			<staticText>
+				<reportElement x="0" y="67" width="156" height="23" uuid="a56a846f-6125-4aea-9108-f5c141ec11ed"/>
+				<textElement>
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TỔNG DOANH THU:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="156" y="67" width="145" height="23" uuid="a5442f40-ed0e-48b7-8986-2c7c5e9a312b"/>
+				<textElement>
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{THANHTIEN_2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="7" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="11" splitType="Stretch"/>
+	</summary>
+</jasperReport>

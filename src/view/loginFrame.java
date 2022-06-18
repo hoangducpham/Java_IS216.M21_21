@@ -18,13 +18,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.imageio.ImageIO;
+import model.User;
+import view.BaseFrame;
 /**
  *
  * @author HP
  */
 public class loginFrame extends javax.swing.JFrame {
 
+    User us;
     private PlaceHolder p1, p2;
+    //private User us;
     /**
      * Creates new form loginFrame
      */
@@ -35,6 +39,7 @@ public class loginFrame extends javax.swing.JFrame {
         p1=new PlaceHolder(txtUsername, "Username");
         p2=new PlaceHolder(txtPassword, "*********");
         editImage();
+        
     }
     
     public boolean status(){
@@ -42,19 +47,28 @@ public class loginFrame extends javax.swing.JFrame {
     }
     
     public int checkLogIn(){
+        
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            Connection conn = DriverManager.getConnection(url, "DOAN_ORACLE","admin");
-            String query1="SELECT USERNAME, PASSWORD FROM NHANVIEN";
+            Connection conn = DriverManager.getConnection(url, "system","user_java123");
+            String query1="SELECT USERNAME, PASSWORD, PHANQUYEN FROM SYS.QLPK_NHANVIEN";
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(query1);
+            
             while(rs.next()){
-                String username=rs.getString("USERNAME");
-                String password=rs.getString("PASSWORD");
-                if(username.equals(txtUsername.getText().toString())){
+//                String username="";
+//                String password="";
+//                int phanQuyen=0;
+                String username=rs.getString(1);
+                String password=rs.getString(2);
+                int phanQuyen=rs.getInt(3);
+                String passText = new String(txtPassword.getPassword());
+                if(username.equals(txtUsername.getText().toString())==true && password.equals(passText)==true){
+                    us=new User(username, password, phanQuyen);
                     return 1;
                 }
             }
+            conn.close();
             return 0;
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,7 +228,9 @@ public class loginFrame extends javax.swing.JFrame {
         //b=true;
         if(checkLogIn()==1){
             JOptionPane.showMessageDialog(rootPane, "Đăng nhập thành công!");
-            BaseFrame bs=new BaseFrame();
+            BaseFrame bs=new BaseFrame(); 
+            bs.setUser(us);
+            bs.setVisible(true);
             this.dispose();
         }
         else{

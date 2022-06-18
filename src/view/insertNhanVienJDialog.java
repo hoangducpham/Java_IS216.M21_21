@@ -5,15 +5,22 @@
  */
 package view;
 
+import java.sql.ResultSet;
 import com.placeholder.PlaceHolder;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 //import jdk.internal.net.http.common.Utils;
 import model.NhanVien;
 import view.BaseFrame;
+import java.sql.Statement;
 
 /**
  *
@@ -27,6 +34,7 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
 
     public int inputNhanVien(){
         //int maNV=1;
+       
         int maNV=Integer.parseInt(txtMaNV.getText());
         String tenNV=txtTenNV.getText().toUpperCase();
         try {
@@ -67,31 +75,59 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
         txtMaPhong.setText("");
     }
     
-    public void showNV(){
-        ArrayList<NhanVien> list= home.nhanVienList();
-        Male.setSelected(true);
-        rbtNhanVien.setSelected(true);
-        txtNgaySinh.setDate(today);
-        int id=1;
-        boolean flag;
-        while(true){
-            flag=false;
-            for(NhanVien nv:list){
-                if(id==nv.getMaNV()){
-                    flag=true;
-                    break;
-                }
-            }
-            if(!flag) break;
-            ++id;
+    private Connection conn;
+    public void connect(){
+        try {
+            String url="jdbc:oracle:thin:@localhost:1521:orcl";
+            conn=DriverManager.getConnection(url,"DOAN_ORACLE","admin");
+        } catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        txtMaNV.setText(id+"");
-        
-        p1=new PlaceHolder(txtTenNV, "Nguyễn Văn A");
-        p2=new PlaceHolder(txtDiaChi, "khu phố 6, phường Linh Trung, quận Thủ Đức");
-        p3=new PlaceHolder(txtSDT, "0781234567");
-        p4=new PlaceHolder(txtMaPhong, "1");
-        p5=new PlaceHolder(txtLuong, "1000000");
+    }
+    
+    public void showNV(){
+        try {
+            //ArrayList<NhanVien> list= home.nhanVienList();
+            Male.setSelected(true);
+            rbtNhanVien.setSelected(true);
+            txtNgaySinh.setDate(today);
+            
+            int maNV=0;
+            connect();
+            String query = "SELECT GET_MANV FROM DUAL";
+            Statement stm=conn.createStatement();
+            ResultSet rs=stm.executeQuery(query);
+            while(rs.next()){
+                maNV=rs.getInt(1);
+            }
+            conn.close();
+            txtMaNV.setText(maNV+"");
+            
+//            int id=1;
+//            boolean flag;
+//            while(true){
+//                flag=false;
+//                for(NhanVien nv:list){
+//                    if(id==nv.getMaNV()){
+//                        flag=true;
+//                        break;
+//                    }
+//                }
+//                if(!flag) break;
+//                ++id;
+//            }
+//            txtMaNV.setText(id+"");
+            
+            
+            
+            p1=new PlaceHolder(txtTenNV, "Nguyễn Văn A");
+            p2=new PlaceHolder(txtDiaChi, "khu phố 6, phường Linh Trung, quận Thủ Đức");
+            p3=new PlaceHolder(txtSDT, "0781234567");
+            p4=new PlaceHolder(txtMaPhong, "1");
+            p5=new PlaceHolder(txtLuong, "1000000");
+        } catch (SQLException ex) {
+            Logger.getLogger(insertNhanVienJDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -143,39 +179,31 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(38, 70, 83));
+        jPanel1.setBackground(new java.awt.Color(204, 204, 255));
         jPanel1.setForeground(new java.awt.Color(244, 162, 97));
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Họ và tên");
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Ngày sinh");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Địa chỉ");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Giới tính");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("Số điện thoại");
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("Chức danh");
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setText("Mã phòng");
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel11.setForeground(new java.awt.Color(255, 255, 255));
         jLabel11.setText("Lương");
 
         txtTenNV.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -230,7 +258,6 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
         });
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Mã nhân viên");
 
         txtMaNV.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -251,7 +278,7 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
             }
         });
 
-        jPanel2.setBackground(new java.awt.Color(231, 111, 81));
+        jPanel2.setBackground(new java.awt.Color(69, 123, 179));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));

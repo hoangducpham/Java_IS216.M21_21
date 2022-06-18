@@ -66,4 +66,6 @@ public class Thuoc {
     public void setNoiSX(String noiSX) {
         this.noiSX = noiSX;
     }
+
+    
 }
