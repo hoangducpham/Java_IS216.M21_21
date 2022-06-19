@@ -40,7 +40,8 @@
 #### 4.2 Yêu cầu phi chức năng
 ##### Yêu cầu về giao diện : Giao diện ứng dễ dàng thao tác, dễ sử dụng, thân thiện với người dùng cũng như người quản lý.
 ##### Yêu cầu về chất lượng: Đảm bảo hoạt động tốt trong quá trình sử dụng.
-
+##### Phân quyền chặt chẽ: Mỗi người dùng được cung cấp một số chức năng nhất định.
+##### Yêu cầu thuận tiện: Dễ sử dụng, thân thiện trực quan.
 
 
 
