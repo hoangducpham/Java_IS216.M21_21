@@ -200,34 +200,40 @@ public class BaseFrame extends javax.swing.JFrame {
     }
     
     
-    
     //sau khi nhập database và list, ta fetch data vào table để hiển thị ra màn hình
     public void show_nhanVien(){
-        tblModelNhanVien=(DefaultTableModel)tblNhanVien.getModel();
-        //tblNhanVien.setModel(tblModelNhanVien);
+        tblModelNhanVien = (DefaultTableModel)tblNhanVien.getModel();
+        tblModelNhanVien.setRowCount(0);
         int j=1;
         for(int i=0; i<listNV.size();i++){
-            Object[] row={j, listNV.get(i).getMaNV(),listNV.get(i).getTenNV(),listNV.get(i).getNgSinh(),listNV.get(i).getDiaChi(),
-                listNV.get(i).getGioiTinh(),listNV.get(i).getSoDT(),listNV.get(i).getChucDanh(),listNV.get(i).getMaPhong(),listNV.get(i).getLuong()};
+            Object[] row={
+                j,
+                listNV.get(i).getMaNV(),
+                listNV.get(i).getTenNV(),
+                listNV.get(i).getNgSinh(),
+                listNV.get(i).getDiaChi(),
+                listNV.get(i).getGioiTinh(),
+                listNV.get(i).getSoDT(),
+                listNV.get(i).getChucDanh(),
+                listNV.get(i).getMaPhong(),
+                listNV.get(i).getLuong()
+            };
             tblModelNhanVien.addRow(row);
             j++;
         }
         setVisible(true);
     }
-    
+   
     //sau khi thêm thông tin nhân viên ở insertNhanVienDialog, ta insert dữ liệu đó vào list và database, sau đó add nhân viên vào table
     public int addNhanVien(){
         try {
-            DefaultTableModel tblModelNhanVien=(DefaultTableModel)tblNhanVien.getModel();
-            int i=listNV.size()-1;
-            int STT=listNV.size();
+            //DefaultTableModel tblModelNhanVien =(DefaultTableModel)tblNhanVien.getModel();
+            tblModelNhanVien=(DefaultTableModel)tblNhanVien.getModel();
+            int i = listNV.size()-1;
             int MaNV=listNV.get(i).getMaNV();
             String TenNV=listNV.get(i).getTenNV();
-            //String NgSinh=listNV.get(i).getNgSinh();
-            String NgSinh=listNV.get(i).getNgSinh();
             
             String date=listNV.get(i).getNgSinh();
-            
             java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
             
@@ -236,39 +242,62 @@ public class BaseFrame extends javax.swing.JFrame {
             String SoDT=listNV.get(i).getSoDT();
             String ChucDanh=listNV.get(i).getChucDanh();
             int MaPhong=Integer.parseInt(listNV.get(i).getMaPhong());
-            long Luong=listNV.get(i).getLuong();
+            long Luong= listNV.get(i).getLuong();
             //thêm vô csdl
             connect();
-            String insert="insert into SYS.QLPK_NHANVIEN values(?,?,?,?,?,?,?,?,?,?,?,?)";
+            String insert="insert into SYS.QLPK_NHANVIEN(HOTEN,NGAYSINH,GIOITINH,SDT,DIACHI,CHUCDANH,PHANQUYEN,MAPHONG,LUONG) values(?,?,?,?,?,?,?,?,?)";
             PreparedStatement pre=conn.prepareStatement(insert);
-            int phanQuyen=1;
+            int phanQuyen = 1;
             if(ChucDanh.equalsIgnoreCase("nhan vien"))
-                phanQuyen=1;
-            else if (ChucDanh.equalsIgnoreCase("quan ly"))
                 phanQuyen=2;
+            else if (ChucDanh.equalsIgnoreCase("quan ly"))
+                phanQuyen=1;
             else{
                 JOptionPane.showMessageDialog(panelKhamBenh, "Nhập chức danh là nhan vien hoặc quan ly");
                 return 0;
             }
             
             //Nhập dữ liệu vô csdl
-            pre.setInt(1, MaNV);
-            pre.setString(2, TenNV);
-            pre.setDate(3, sqlDate);
-            pre.setString(4, GioiTinh);
+            pre.setString(1, TenNV);
+            pre.setDate(2, sqlDate);
+            pre.setString(3, GioiTinh);
+            pre.setString(4, SoDT);
             pre.setString(5, DiaChi);
-            pre.setString(6, SoDT);
-            pre.setString(7, MaNV+"");
-            pre.setString(8, SoDT);
-            pre.setInt(9, phanQuyen);
-            pre.setString(10, ChucDanh);
-            pre.setInt(11, MaPhong);
-            pre.setLong(12, Luong);
-            int x=pre.executeUpdate();
+            pre.setString(6, ChucDanh);
+            pre.setInt(7, phanQuyen);
+            pre.setInt(8, MaPhong);
+            pre.setLong(9, Luong);
+            int x = pre.executeUpdate();
             JOptionPane.showMessageDialog(panelKhamBenh, x+" dòng đã được thêm vào csdl");
             
-            Object[] objs={STT, MaNV, TenNV, NgSinh, DiaChi, GioiTinh ,SoDT, ChucDanh, MaPhong,Luong};
-            tblModelNhanVien.addRow(objs);
+//            String select = "SELECT * FROM SYS.QLPK_NHANVIEN";
+//            Statement statement = conn.createStatement();
+//            ResultSet rs = statement.executeQuery(select);
+//            
+//            tblModelNhanVien.setRowCount(0);
+//            int STT = 1;
+//            while(rs.next()) {
+//                Object[] objs={
+//                    STT,
+//                    rs.getInt("MANV"),
+//                    rs.getString("HOTEN"),
+//                    rs.getDate("NGAYSINH"),
+//                    rs.getString("DIACHI"),
+//                    rs.getString("GIOITINH"),
+//                    rs.getString("SDT"),
+//                    rs.getString("CHUCDANH"),
+//                    rs.getInt("MAPHONG"),
+//                    rs.getLong("LUONG")
+//                };
+//                tblModelNhanVien.addRow(objs);
+//                STT++;
+//            }
+            
+            this.listNV = nhanVienList();
+            show_nhanVien();
+            
+            //Object[] objs={STT, MaNV, TenNV, NgSinh, DiaChi, GioiTinh ,SoDT, ChucDanh, MaPhong,Luong};
+            //tblModelNhanVien.addRow(objs);
             conn.close();
             return 1;
         }catch (SQLException ex) {
@@ -323,17 +352,29 @@ public class BaseFrame extends javax.swing.JFrame {
         }  
     }
     
+    
     public int deleteThuoc(int maThuoc){
         try {
-            tblModelThuoc.removeRow(location);
-            listThuoc.remove(location);
-            location=-1;
-//            String url="jdbc:oracle:thin:@localhost:1521:orcl";
-//            Connection conn=DriverManager.getConnection(url,"system","user_java123");
+            //tblModelThuoc.removeRow(location);
+            //listThuoc.remove(location);
+            //location=-1;
             connect();
             String delete="delete from SYS.QLPK_THUOC where MATHUOC="+maThuoc;
             Statement stm=conn.createStatement();
             int x=stm.executeUpdate(delete);
+            
+            String select="SELECT * FROM SYS.QLPK_THUOC";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            
+            tblModelThuoc.setRowCount(0);
+            while(rs.next()) {
+                Object[] objs ={rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5)};
+                tblModelThuoc.addRow(objs);
+            }
+            
+            
+            
             conn.close();
             return x;
         } catch (SQLException ex) {
@@ -383,7 +424,7 @@ public class BaseFrame extends javax.swing.JFrame {
             //String NgSinh=listNV.get(i).getNgSinh();
             
             String date=listNV.get(i).getNgSinh();
-            java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
+            java.util.Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
             java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
             
             String DiaChi=listNV.get(i).getDiaChi();
@@ -505,7 +546,7 @@ public class BaseFrame extends javax.swing.JFrame {
             String TenBN=listBN.get(i).getHoTen();
             
             String date=listBN.get(i).getNgaySinh();
-            java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
+            java.util.Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
             java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
             
             String DiaChi=listBN.get(i).getDiaChi();
@@ -707,29 +748,41 @@ public class BaseFrame extends javax.swing.JFrame {
     public int addThuoc(){
         try {
             int i=listThuoc.size()-1;
-            int STT=listThuoc.size();
-            int MaThuoc=listThuoc.get(i).getMaThuoc();
+            //int STT=listThuoc.size();
+            //int MaThuoc=listThuoc.get(i).getMaThuoc();
             String TenThuoc=listThuoc.get(i).getLoaiThuoc();
             String DonVi=listThuoc.get(i).getDonVi();
             int DonGia=listThuoc.get(i).getDonGia();
             String NoiSX=listThuoc.get(i).getNoiSX();
-            Object[] objs={STT, MaThuoc, TenThuoc, DonVi, DonGia,NoiSX};
-            
+            //Object[] objs={ STT, TenThuoc, DonVi, DonGia, NoiSX};
             //thêm vô csdl
             connect();
-            String insert="insert into SYS.QLPK_THUOC values(?,?,?,?,?)";
+            String insert="insert into SYS.QLPK_THUOC(LOAITHUOC,DONVI,DONGIA,NOISX) values(?,?,?,?)";
             PreparedStatement pre=conn.prepareStatement(insert);
+            
            
             //Nhập dữ liệu vô csdl
-            pre.setInt(1, MaThuoc);
-            pre.setString(2, TenThuoc);
-            pre.setString(3, DonVi);
-            pre.setInt(4, DonGia);
-            pre.setString(5, NoiSX);
-            int x=pre.executeUpdate();
+            //pre.setInt(1, MaThuoc);
+            pre.setString(1, TenThuoc);
+            pre.setString(2, DonVi);
+            pre.setInt(3, DonGia);
+            pre.setString(4, NoiSX);
+            int x = pre.executeUpdate();
             JOptionPane.showMessageDialog(this, x+" dòng đã được thêm vào csdl");
             
-            tblModelThuoc.addRow(objs);
+            String select="SELECT * FROM SYS.QLPK_THUOC";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            
+            tblModelThuoc.setRowCount(0);
+            while(rs.next()) {
+                Object[] objs ={rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5)};
+                tblModelThuoc.addRow(objs);
+            }
+            
+            
+            
+            
             conn.close();
             return 1;
         }catch (SQLException ex) {
@@ -2569,7 +2622,7 @@ public class BaseFrame extends javax.swing.JFrame {
 
     private void jButtonNhanvienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNhanvienActionPerformed
         // TODO add your handling code here:
-        if(quanLy==1){
+        if(quanLy!=1){
             JOptionPane.showMessageDialog(panelKhamBenh, "Chỉ có quản lý mới được xem mục này");
         }
         else{

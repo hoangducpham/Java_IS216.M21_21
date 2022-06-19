@@ -29,7 +29,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
             txtTenNV.setText(nv.getTenNV());
             //txtNgaySinh.setText(nv.getNgSinh());
             String date=nv.getNgSinh();
-            Date date2 = new SimpleDateFormat("MMMM d, yyyy").parse(date);
+            Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
             txtNgaySinh.setDate(date2);
             //txtNgaySinh.setDate(nv.getNgSinh());
             txtDiaChi.setText(nv.getDiaChi());
@@ -72,7 +72,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
         int maNV=Integer.parseInt(txtMaNV.getText());
         String tenNV=txtTenNV.getText();
         try {
-            SimpleDateFormat dateFormat=new SimpleDateFormat("MMMM d, y");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
             String ngaySinh=dateFormat.format(txtNgaySinh.getDate());
             String diaChi=txtDiaChi.getText();
             long luong=Long.parseLong(this.txtLuong.getText());
@@ -218,8 +218,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
             }
         });
 
-        btCapNhat.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        btCapNhat.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\Pencil-icon.png")); // NOI18N
+        btCapNhat.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btCapNhat.setText("SỬA");
         btCapNhat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -227,8 +226,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
             }
         });
 
-        btThoat.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        btThoat.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\Exit-icon.png")); // NOI18N
+        btThoat.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btThoat.setText("THOÁT");
         btThoat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -241,8 +239,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
 
         txtMaNV.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
-        btXoa.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
-        btXoa.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\Trash-can-icon.png")); // NOI18N
+        btXoa.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btXoa.setText("XÓA");
         btXoa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -308,7 +305,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 30, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -336,8 +333,8 @@ public class showNhanVienDialog extends javax.swing.JDialog {
                         .addComponent(txtLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(51, 51, 51)
                         .addComponent(btThoat)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
+                .addContainerGap(35, Short.MAX_VALUE))
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -391,7 +388,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtLuong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel10, jLabel3, jLabel4, jLabel5, jLabel6, jLabel7, jLabel8, jLabel9});
@@ -400,7 +397,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

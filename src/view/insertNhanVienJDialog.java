@@ -38,7 +38,7 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
         int maNV=Integer.parseInt(txtMaNV.getText());
         String tenNV=txtTenNV.getText().toUpperCase();
         try {
-            SimpleDateFormat dateFormat=new SimpleDateFormat("MMMM d, y");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("dd-MM-yyyy");
             String ngaySinh=dateFormat.format(txtNgaySinh.getDate());
             String diaChi=txtDiaChi.getText().toUpperCase();
             long luong=Long.parseLong(this.txtLuong.getText());
@@ -79,7 +79,7 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
     public void connect(){
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"DOAN_ORACLE","admin");
+            conn=DriverManager.getConnection(url,"system","user_java123");
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -94,7 +94,7 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
             
             int maNV=0;
             connect();
-            String query = "SELECT GET_MANV FROM DUAL";
+            String query = "SELECT MANV FROM SYS.QLPK_NHANVIEN";
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(query);
             while(rs.next()){

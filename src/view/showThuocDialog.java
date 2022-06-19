@@ -20,7 +20,7 @@ import model.Thuoc;
 
 /**
  *
- * @author Admin
+ * @author Khaitruong_18520878
  */
 public class showThuocDialog extends javax.swing.JDialog {
     private String donVi;
