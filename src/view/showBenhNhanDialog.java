@@ -15,7 +15,7 @@ import model.BenhNhan;
 
 /**
  *
- * @author HP
+ * @author An Phan
  */
 public class showBenhNhanDialog extends javax.swing.JDialog {
     private String gioiTinh;
@@ -28,7 +28,7 @@ public class showBenhNhanDialog extends javax.swing.JDialog {
             txtHoTen.setText(bn.getHoTen());
             //txtNgaySinh.setText(nv.getNgSinh());
             String date=bn.getNgaySinh();
-            Date date2 = new SimpleDateFormat("MMMM d, yyyy").parse(date);
+            Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             txtNgaySinh.setDate(date2);
             if(bn.getGioiTinh().equalsIgnoreCase("MALE")){
                 Male.setSelected(true);
@@ -54,7 +54,7 @@ public class showBenhNhanDialog extends javax.swing.JDialog {
         //kiểm tra thông tin có đúng chuẩn ko
         String tenBN=txtHoTen.getText();
         try {
-            SimpleDateFormat dateFormat=new SimpleDateFormat("MMMM d, y");
+            SimpleDateFormat dateFormat=new SimpleDateFormat("dd-MM-yyyy");
             String ngaySinh=dateFormat.format(txtNgaySinh.getDate());
             String diaChi=txtDiaChi.getText();
             String soDT=txtSDT.getText();

@@ -8,7 +8,7 @@
 	<parameter name="LiDo" class="java.lang.String"/>
 	<parameter name="maPK" class="java.lang.String"/>
 	<queryString language="SQL">
-		<![CDATA[select * from HOADON]]>
+		<![CDATA[select * from SYS.QLPK_HOADON]]>
 	</queryString>
 	<field name="MAHD" class="java.math.BigDecimal"/>
 	<field name="MABN" class="java.math.BigDecimal"/>

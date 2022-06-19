@@ -57,7 +57,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author MyPC
+ * @author An Phan
  */
 public class BaseFrame extends javax.swing.JFrame {
     User us = new User();
@@ -91,7 +91,7 @@ public class BaseFrame extends javax.swing.JFrame {
         ArrayList<NhanVien> nhanViensList=new ArrayList<>();
         String url="jdbc:oracle:thin:@localhost:1521:orcl";
         try{
-            Connection conn = DriverManager.getConnection(url,"system","user_java123");
+            Connection conn = DriverManager.getConnection(url,"system","panda6969");
             String query1 = "SELECT MaNV, HoTen, to_char(NgaySinh, 'yyyy/mm/dd') as NgaySinh, DiaChi, GioiTinh, SDT, ChucDanh, MaPhong, Luong "
                     + "FROM SYS.QLPK_NHANVIEN";
             Statement stm = conn.createStatement();
@@ -181,7 +181,7 @@ public class BaseFrame extends javax.swing.JFrame {
     public void connect(){
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"system","user_java123");
+            conn=DriverManager.getConnection(url,"system","panda6969");
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -573,52 +573,61 @@ public class BaseFrame extends javax.swing.JFrame {
     }
    
     
-    public void addBenhNhan(BenhNhan s){
-        listBN.add(s);
-        tblModel = (DefaultTableModel)tblBN.getModel();
-        tblModel.setRowCount(0);
-        tblModelBN.setRowCount(0);
-        int i = 1;
-        for(BenhNhan bn: listBN){
-            tblModel.addRow(new Object[]{i,bn.getMaBN(),bn.getHoTen(),bn.getNgaySinh(),bn.getGioiTinh(),bn.getDiaChi(),bn.getSDT()});
-            tblModelBN.addRow(new Object[]{bn.getMaBN(),bn.getHoTen(),bn.getNgaySinh(),bn.getGioiTinh(),bn.getDiaChi(),bn.getSDT()});
-            i++;
-        }
-    }
-    
-    public void setMaBN(){
-        try {
-            int maBN=0;
-            connect();
-            String query = "SELECT GET_MABN FROM DUAL";
-            Statement stm=conn.createStatement();
-            ResultSet rs=stm.executeQuery(query);
-            while(rs.next()){
-                maBN=rs.getInt(1);
-            }
-            txtMaBN.setText(maBN+"");
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+//    public void updatetbBN(){
+//        try {
+//            tblModel = (DefaultTableModel)tblBN.getModel();
+//            tblModel.setRowCount(0);
+//            connect();
+//            String query = "SELECT * FROM SYS.QLPK_BENHNHAN";
+//            Statement stm=conn.createStatement();
+//            ResultSet rs=stm.executeQuery(query);
+//            while(rs.next()){
+//                tblModelBN.addRow(new Object[]{
+//                    rs.getInt("MaBN"),
+//                    rs.getString("..."),
+//           
+//                });
+//            }
+//            conn.close();
+//        } catch (SQLException ex) {
+//            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     
     public int getMaBN(){
         return maBN;
     }
    
     public void show_BN(){
-        //ArrayList<BenhNhan> list = getBenhNhanList();
-        tblModel =(DefaultTableModel)tblBN.getModel();
-        int j = 1;
-        for(int i=0; i<listBN.size(); i++){
-            Object[] row={j, listBN.get(i).getMaBN(), listBN.get(i).getHoTen(), listBN.get(i).getNgaySinh(), 
-                         listBN.get(i).getGioiTinh(), listBN.get(i).getDiaChi(), listBN.get(i).getSDT()};
-            tblModel.addRow(row);
-            j++;
+        try {
+            tblModel =(DefaultTableModel)tblBN.getModel();
+            tblModel.setRowCount(0);
+            connect();
+            String query = "SELECT * FROM SYS.QLPK_BENHNHAN";
+            Statement stm=conn.createStatement();
+            ResultSet rs=stm.executeQuery(query);
+            int i = 1;
+            while(rs.next()){
+                Date ngaySinh = rs.getDate("NGAYSINH");
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");  
+                String NgaySinh = dateFormat.format(ngaySinh); 
+                tblModel.addRow(new Object[]{
+                    i,
+                    rs.getInt("MaBN"),
+                    rs.getString("HOTEN"), 
+                    NgaySinh,
+                    rs.getString("GIOITINH"),
+                    rs.getString("DIACHI"),
+                    rs.getString("SDT")                    
+                });
+                i++;
+            }
+            
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        setMaBN();
-//        txtMaBN.setEditable(false);
+        
         updateCBBchuanDoan();
         updateCBBbacSi();
     }
@@ -788,12 +797,17 @@ public class BaseFrame extends javax.swing.JFrame {
     
     public void updateCBBloaiThuoc(){
         try{
+
+
             connect();
+          
             String query2 = "SELECT LOAITHUOC FROM SYS.QLPK_THUOC";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
+
             while(rs.next()){          
                 cbbLoaiThuoc.addItem(rs.getString(1));
+                
             }
             conn.close();
         }catch(SQLException e){
@@ -833,16 +847,16 @@ public class BaseFrame extends javax.swing.JFrame {
         else{
             try{
                 connect();
-                String getMaThuoc="select MATHUOC FROM SYS.QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
+                String getMaThuoc="select distinct MATHUOC FROM SYS.QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
                 Statement stm=conn.createStatement();
                 ResultSet rs=stm.executeQuery(getMaThuoc);
+                
                 while(rs.next()){
                     maThuoc=rs.getInt(1);
                 }
                 
-                String insert="insert into SYS.QLPK_TOATHUOC values(?,?,?,?,?,?)";
+                String insert="insert into SYS.QLPK_TOATHUOC (MAHD,MATHUOC,SOLUONG,THANHTIEN,CACHDUNG,TINHTRANG) values(?,?,?,?,?,?)";
                 PreparedStatement pre=conn.prepareStatement(insert);
-                
                 //Nhập dữ liệu vô csdl
                 pre.setInt(1, maHD);
                 pre.setInt(2, maThuoc);
@@ -873,6 +887,7 @@ public class BaseFrame extends javax.swing.JFrame {
         txtHoTen.setEditable(false);
         txtLiDoKham.setEditable(false);
         updateCBBloaiThuoc();
+
         txtDonVi.setEditable(false);
         txtMaHD.setEditable(false);
         tblModelToaThuoc=(DefaultTableModel)tblToaThuoc.getModel();
@@ -1216,7 +1231,6 @@ public class BaseFrame extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1006, 520));
 
         jPanel_title.setBackground(new java.awt.Color(69, 123, 179));
         jPanel_title.setPreferredSize(new java.awt.Dimension(1001, 65));
@@ -1503,6 +1517,9 @@ public class BaseFrame extends javax.swing.JFrame {
         jLabel20.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel20.setText("SĐT");
 
+        txtMaBN.setEditable(false);
+        txtMaBN.setRequestFocusEnabled(false);
+
         jMale.setText("MALE");
         jMale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1581,7 +1598,7 @@ public class BaseFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1))
                     .addComponent(jLabel13))
-                .addGap(35, 56, Short.MAX_VALUE))
+                .addGap(35, 42, Short.MAX_VALUE))
         );
         panelTiepNhanLayout.setVerticalGroup(
             panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2569,7 +2586,7 @@ public class BaseFrame extends javax.swing.JFrame {
 
     private void jButtonNhanvienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNhanvienActionPerformed
         // TODO add your handling code here:
-        if(quanLy==1){
+        if(quanLy!=1){
             JOptionPane.showMessageDialog(panelKhamBenh, "Chỉ có quản lý mới được xem mục này");
         }
         else{
@@ -2593,8 +2610,10 @@ public class BaseFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         panelBenhNhan.setVisible(false);
         panelNhanVien.setVisible(false);
+        
         panelKhamBenh.setVisible(false);
         panelTiepNhan.setVisible(true);
+        
         panelThuoc.setVisible(false);
         panelThongKe.setVisible(false);
         
@@ -2693,9 +2712,9 @@ public class BaseFrame extends javax.swing.JFrame {
                 String soDT = txtSDT.getText();
 
                 if(flag == true){
-                    BenhNhan bn = new BenhNhan(maBN,tenBN,ngaySinh,gioiTinh,diaChi,soDT);
-                    addBenhNhan(bn);
-                    JOptionPane.showMessageDialog(this, "Thêm thành công");
+                   // BenhNhan bn = new BenhNhan(maBN,tenBN,ngaySinh,gioiTinh,diaChi,soDT);
+                 //   addBenhNhan(bn);
+                 //   JOptionPane.showMessageDialog(this, "Thêm thành công");
 
                     java.util.Date today = new java.util.Date();
                     txtTenBN.setText("");
@@ -2705,17 +2724,26 @@ public class BaseFrame extends javax.swing.JFrame {
                     
                     connect();
                     try {
-                        String insert = "insert into SYS.QLPK_BENHNHAN values(?,?,?,?,?)";
+                        String insert = "insert into SYS.QLPK_BENHNHAN (HOTEN,NGAYSINH,GIOITINH,SDT,DIACHI) values(?,?,?,?,?)";
                         PreparedStatement st = conn.prepareStatement(insert);
                         st.setString(1, tenBN);
                         st.setDate(2, sqlDate);
                         st.setString(3, gioiTinh);
                         st.setString(4, diaChi);
                         st.setString(5, soDT);
+                        
                         int a = st.executeUpdate();
 
 //                        setMaBN();
-                        this.maBN=maBN;
+                        JOptionPane.showMessageDialog(this, "Thêm thành công");
+
+                        String getmabn = "select MAX(MABN) from SYS.QLPK_BENHNHAN";
+                        Statement stm = conn.createStatement();
+                        ResultSet rs = stm.executeQuery(getmabn);
+                        while(rs.next()){
+                            this.maBN=rs.getInt(1);
+                        }
+                       // this.maBN=maBN;
                         InserpkJdialog show=new InserpkJdialog(this, true);
                         show.setVisible(true);
                     } catch (SQLException ex) {
@@ -2862,7 +2890,7 @@ public class BaseFrame extends javax.swing.JFrame {
             
         try {    
             Map<String, Object> parameters = new HashMap<String, Object>();
-            JasperDesign jasperDesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\report1.jrxml");
+            JasperDesign jasperDesign = JRXmlLoader.load("D:\\Nam4_Ki2\\Java\\Java_IS216.M21_21\\src\\report\\report1.jrxml");
             parameters.put("maBN", txtMaBNKham.getText().toString());
             parameters.put("maHD", txtMaHD.getText().toString());
             parameters.put("hoTen", txtHoTen.getText().toString());
@@ -2889,15 +2917,6 @@ public class BaseFrame extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_btThemBenhAnActionPerformed
-
-    private void tblBNMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBNMouseReleased
-        // TODO add your handling code here:
-//        if(evt.getButton()==MouseEvent.BUTTON3){
-//            if(evt.isPopupTrigger()&&tblBN.getSelectedRowCount()!=0){
-//                PopUpMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-//            }
-//        }
-    }//GEN-LAST:event_tblBNMouseReleased
 
     private void txtTimMaThuocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTimMaThuocActionPerformed
         DefaultTableModel table= (DefaultTableModel)tblThuoc.getModel();
@@ -3020,7 +3039,7 @@ public class BaseFrame extends javax.swing.JFrame {
     private void btTimMaBNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTimMaBNActionPerformed
         //boolean flag = true;
         try {
-                int maBN = Integer.parseInt(txtTimBenhNhan.getText());
+                String maBN = String.valueOf(txtTimBenhNhan.getText());
                 String sql="SELECT MABN FROM SYS.QLPK_BENHNHAN WHERE MABN="+maBN;
 
                 connect();
@@ -3056,7 +3075,7 @@ public class BaseFrame extends javax.swing.JFrame {
             if(flag == true){
                 int maBN = Integer.parseInt(txtTimMaBN.getText());
                 String sql="SELECT MABN FROM SYS.QLPK_BENHNHAN WHERE MABN="+maBN;
-
+                
                 connect();
                 Statement stm=conn.createStatement();
                 ResultSet rs=stm.executeQuery(sql);
@@ -3079,7 +3098,7 @@ public class BaseFrame extends javax.swing.JFrame {
                 }
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelKhamBenh, "Mã nhân viên là số");
+            JOptionPane.showMessageDialog(panelKhamBenh, "Mã bê?nh nhân là số");
             flag = false;
         }  
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -3104,7 +3123,7 @@ public class BaseFrame extends javax.swing.JFrame {
 
     private void jButtonThongkeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonThongkeActionPerformed
         // TODO add your handling code here:
-        if(quanLy==1){
+        if(quanLy!=1){
             JOptionPane.showMessageDialog(panelKhamBenh, "Chỉ có quản lý mới được xem mục này");
         }
         else{
@@ -3198,7 +3217,7 @@ public class BaseFrame extends javax.swing.JFrame {
                 connect();
                 try {
                     Map<String, Object> parameters = new HashMap<String, Object>();
-                    JasperDesign jdesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\reportThongKe.jrxml");
+                    JasperDesign jdesign = JRXmlLoader.load("D:\\Nam4_Ki2\\Java\\Java_IS216.M21_21\\src\\report\\reportThongKe.jrxml");
                     //parameters.put("TongDoanhThu", rutGonDoanhThu(thanhtien)+" VNĐ");
                     parameters.put("Thang", cbbMonth.getSelectedItem().toString());
                     parameters.put("Nam", txtYear.getSelectedItem().toString());
@@ -3221,7 +3240,7 @@ public class BaseFrame extends javax.swing.JFrame {
             connect();
             try {
                 Map<String, Object> parameters = new HashMap<String, Object>();
-                JasperDesign jdesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\newReport2.jrxml");
+                JasperDesign jdesign = JRXmlLoader.load("D:\\Nam4_Ki2\\Java\\Java_IS216.M21_21\\src\\report\\newReport2.jrxml");
                 //parameters.put("TongDoanhThu", rutGonDoanhThu(thanhtien)+" VNĐ");
                 parameters.put("Nam", txtYear.getSelectedItem().toString());
 
@@ -3246,6 +3265,15 @@ public class BaseFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         jMale.setSelected(false);
     }//GEN-LAST:event_jFemaleActionPerformed
+
+    private void tblBNMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBNMouseReleased
+        // TODO add your handling code here:
+        //        if(evt.getButton()==MouseEvent.BUTTON3){
+            //            if(evt.isPopupTrigger()&&tblBN.getSelectedRowCount()!=0){
+                //                PopUpMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+                //            }
+            //        }
+    }//GEN-LAST:event_tblBNMouseReleased
 
     /**
      * @param args the command line arguments

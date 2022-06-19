@@ -44,7 +44,7 @@ public class InserpkJdialog extends javax.swing.JDialog {
         home = (BaseFrame) parent;
         this.setTitle("Nhập thông tin phiếu khám");
         this.setLocationRelativeTo(null);
-        setMaPK();
+ //       setMaPK();
         txtMaPK.setEditable(false);
         txtMaPK.setText(maPK+"");
         txtMaBN.setEditable(false);
@@ -55,26 +55,26 @@ public class InserpkJdialog extends javax.swing.JDialog {
     public void connect(){
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"DOAN_ORACLE","admin");
+            conn=DriverManager.getConnection(url,"system","panda6969");
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void setMaPK(){
-        try {
-            connect();
-            String query = "SELECT GET_MAHD FROM DUAL";
-            Statement stm=conn.createStatement();
-            ResultSet rs=stm.executeQuery(query);
-            while(rs.next()){
-                maPK=rs.getInt(1);
-            }
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+//    public void setMaPK(){
+//        try {
+//            connect();
+//            String query = "SELECT GET_MAHD FROM DUAL";
+//            Statement stm=conn.createStatement();
+//            ResultSet rs=stm.executeQuery(query);
+//            while(rs.next()){
+//                maPK=rs.getInt(1);
+//            }
+//            conn.close();
+//        } catch (SQLException ex) {
+//            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     
 
     
@@ -229,15 +229,15 @@ public class InserpkJdialog extends javax.swing.JDialog {
 
     private void btThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btThemActionPerformed
         String liDoKham=txtLiDoKham.getText();
-        if(txtMaPK.getText().equals("")||txtMaBN.getText().equals("")||txtLiDoKham.getText().equals("")){
+        if(txtMaBN.getText().equals("")||txtLiDoKham.getText().equals("")){
             JOptionPane.showMessageDialog(this, "Bạn hãy điền đầy đủ thông tin");
         }
         else{
             try {
                 java.util.Date today = new java.util.Date();
-                DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 String ngayKham = dateFormat.format(today);
-                java.util.Date date2 = new SimpleDateFormat("MMM d, yyyy").parse(ngayKham);
+                java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(ngayKham);
                 java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
                 
                 connect();
@@ -247,17 +247,16 @@ public class InserpkJdialog extends javax.swing.JDialog {
                     Logger.getLogger(InserpkJdialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
-                    String insert = "insert into HOADON values(?,?,?,?,?,?,?,?,?)";
+                    String insert = "insert into SYS.QLPK_HOADON(mabn,manv,lidokham,trieuchung,chandoan,tienkham,thanhtien,ngaykham) values(?,?,?,?,?,?,?,?)";
                     PreparedStatement st = conn.prepareStatement(insert);
-                    st.setInt(1, maPK);
-                    st.setInt(2, home.getMaBN());
-                    st.setInt(3, 0);
-                    st.setString(4, liDoKham);
+                    st.setInt(1, home.getMaBN());
+                    st.setInt(2, 21);
+                    st.setString(3, liDoKham);
+                    st.setString(4, "");
                     st.setString(5, "");
-                    st.setString(6, "");
+                    st.setInt(6, 30000);
                     st.setInt(7, 30000);
-                    st.setInt(8, 30000);
-                    st.setDate(9, sqlDate);
+                    st.setDate(8, sqlDate);
                     
                     int x = st.executeUpdate();
                     if(x > 0){
@@ -267,7 +266,7 @@ public class InserpkJdialog extends javax.swing.JDialog {
                     }
                     
                 String tenBN = "";
-                String sql = "Select HOTEN From BENHNHAN Where MABN="+txtMaBN.getText();
+                String sql = "Select HOTEN From SYS.QLPK_BENHNHAN Where MABN="+txtMaBN.getText();
                 Statement stm = conn.createStatement();
                 ResultSet rs = stm.executeQuery(sql);
                 while(rs.next()){
@@ -275,7 +274,7 @@ public class InserpkJdialog extends javax.swing.JDialog {
                 }
                 try{
                     Map<String, Object> parameters = new HashMap<String, Object>();
-                    JasperDesign jdesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\report2.jrxml");
+                    JasperDesign jdesign = JRXmlLoader.load("D:\\Nam4_Ki2\\Java\\Java_IS216.M21_21\\src\\report\\report2.jrxml");
                     parameters.put("maPK", txtMaPK.getText());
                     parameters.put("maBN", txtMaBN.getText());
                     parameters.put("LiDo", txtLiDoKham.getText());
