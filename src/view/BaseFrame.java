@@ -91,9 +91,9 @@ public class BaseFrame extends javax.swing.JFrame {
         ArrayList<NhanVien> nhanViensList=new ArrayList<>();
         String url="jdbc:oracle:thin:@localhost:1521:orcl";
         try{
-            Connection conn = DriverManager.getConnection(url,"system","user_java123");
+            Connection conn = DriverManager.getConnection(url,"system","khaitruong190220");
             String query1 = "SELECT MaNV, HoTen, to_char(NgaySinh, 'yyyy/mm/dd') as NgaySinh, DiaChi, GioiTinh, SDT, ChucDanh, MaPhong, Luong "
-                    + "FROM SYS.QLPK_NHANVIEN";
+                    + "FROM QLPK_NHANVIEN";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query1);
             NhanVien nv;
@@ -181,7 +181,7 @@ public class BaseFrame extends javax.swing.JFrame {
     public void connect(){
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"system","user_java123");
+            conn=DriverManager.getConnection(url,"system","khaitruong190220");
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -200,7 +200,6 @@ public class BaseFrame extends javax.swing.JFrame {
     }
     
     
-    
     //sau khi nhập database và list, ta fetch data vào table để hiển thị ra màn hình
     public void show_nhanVien(){
         tblModelNhanVien=(DefaultTableModel)tblNhanVien.getModel();
@@ -214,11 +213,12 @@ public class BaseFrame extends javax.swing.JFrame {
         }
         setVisible(true);
     }
-    
+   
     //sau khi thêm thông tin nhân viên ở insertNhanVienDialog, ta insert dữ liệu đó vào list và database, sau đó add nhân viên vào table
     public int addNhanVien(){
         try {
-            DefaultTableModel tblModelNhanVien=(DefaultTableModel)tblNhanVien.getModel();
+            //DefaultTableModel tblModelNhanVien =(DefaultTableModel)tblNhanVien.getModel();
+            tblModelNhanVien=(DefaultTableModel)tblNhanVien.getModel();
             int i=listNV.size()-1;
             int STT=listNV.size();
             int MaNV=listNV.get(i).getMaNV();
@@ -236,39 +236,50 @@ public class BaseFrame extends javax.swing.JFrame {
             String SoDT=listNV.get(i).getSoDT();
             String ChucDanh=listNV.get(i).getChucDanh();
             int MaPhong=Integer.parseInt(listNV.get(i).getMaPhong());
-            long Luong=listNV.get(i).getLuong();
+            long Luong= listNV.get(i).getLuong();
             //thêm vô csdl
             connect();
-            String insert="insert into SYS.QLPK_NHANVIEN values(?,?,?,?,?,?,?,?,?,?,?,?)";
+            String insert="insert into QLPK_NHANVIEN(HOTEN,NGAYSINH,GIOITINH,SDT,DIACHI,CHUCDANH,PHANQUYEN,MAPHONG,LUONG) values(?,?,?,?,?,?,?,?,?)";
             PreparedStatement pre=conn.prepareStatement(insert);
-            int phanQuyen=1;
+            int phanQuyen = 1;
             if(ChucDanh.equalsIgnoreCase("nhan vien"))
-                phanQuyen=1;
-            else if (ChucDanh.equalsIgnoreCase("quan ly"))
                 phanQuyen=2;
+            else if (ChucDanh.equalsIgnoreCase("quan ly"))
+                phanQuyen=1;
             else{
                 JOptionPane.showMessageDialog(panelKhamBenh, "Nhập chức danh là nhan vien hoặc quan ly");
                 return 0;
             }
             
             //Nhập dữ liệu vô csdl
-            pre.setInt(1, MaNV);
-            pre.setString(2, TenNV);
-            pre.setDate(3, sqlDate);
-            pre.setString(4, GioiTinh);
+            //pre.setInt(1, MaNV);
+            pre.setString(1, TenNV);
+            pre.setDate(2, sqlDate);
+            pre.setString(3, GioiTinh);
+            pre.setString(4, SoDT);
             pre.setString(5, DiaChi);
-            pre.setString(6, SoDT);
-            pre.setString(7, MaNV+"");
-            pre.setString(8, SoDT);
-            pre.setInt(9, phanQuyen);
-            pre.setString(10, ChucDanh);
-            pre.setInt(11, MaPhong);
-            pre.setLong(12, Luong);
+            pre.setString(6, ChucDanh);
+            pre.setInt(7, phanQuyen);
+            pre.setInt(8, MaPhong);
+            pre.setLong(9, Luong);
             int x=pre.executeUpdate();
             JOptionPane.showMessageDialog(panelKhamBenh, x+" dòng đã được thêm vào csdl");
             
-            Object[] objs={STT, MaNV, TenNV, NgSinh, DiaChi, GioiTinh ,SoDT, ChucDanh, MaPhong,Luong};
-            tblModelNhanVien.addRow(objs);
+            String select="SELECT * FROM QLPK_NHANVIEN";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            
+            tblModelNhanVien.setRowCount(0);
+            int STT1 = 1;
+            while(rs.next()) {
+                Object[] objs={STT1, rs.getInt(1), rs.getString(2), rs.getDate(3), rs.getString("DIACHI"), rs.getString(4) ,rs.getString("SDT"), rs.getString(7), rs.getInt(9)};
+                tblModelNhanVien.addRow(objs);
+                STT1++;
+                System.out.println(rs.getString(6));
+            }
+            
+            //Object[] objs={STT, MaNV, TenNV, NgSinh, DiaChi, GioiTinh ,SoDT, ChucDanh, MaPhong,Luong};
+            //tblModelNhanVien.addRow(objs);
             conn.close();
             return 1;
         }catch (SQLException ex) {
@@ -290,7 +301,7 @@ public class BaseFrame extends javax.swing.JFrame {
 //            String url="jdbc:oracle:thin:@localhost:1521:orcl";
 //            Connection conn=DriverManager.getConnection(url,"system","user_java123");
             connect();
-            String delete="delete from SYS.QLPK_NHANVIEN where MANV="+manv;
+            String delete="delete from QLPK_NHANVIEN where MANV="+manv;
             Statement stm=conn.createStatement();
             int x=stm.executeUpdate(delete);
             txtTimMaNV.setText(""); 
@@ -311,7 +322,7 @@ public class BaseFrame extends javax.swing.JFrame {
 //            String url="jdbc:oracle:thin:@localhost:1521:orcl";
 //            Connection conn=DriverManager.getConnection(url,"system","user_java123");
             connect();
-            String delete="delete from SYS.QLPK_BENHNHAN where MABN="+mabn;
+            String delete="delete from QLPK_BENHNHAN where MABN="+mabn;
             Statement stm=conn.createStatement();
             int x=stm.executeUpdate(delete);
             conn.close();
@@ -323,17 +334,29 @@ public class BaseFrame extends javax.swing.JFrame {
         }  
     }
     
+    
     public int deleteThuoc(int maThuoc){
         try {
-            tblModelThuoc.removeRow(location);
-            listThuoc.remove(location);
-            location=-1;
-//            String url="jdbc:oracle:thin:@localhost:1521:orcl";
-//            Connection conn=DriverManager.getConnection(url,"system","user_java123");
+            //tblModelThuoc.removeRow(location);
+            //listThuoc.remove(location);
+            //location=-1;
             connect();
-            String delete="delete from SYS.QLPK_THUOC where MATHUOC="+maThuoc;
+            String delete="delete from QLPK_THUOC where MATHUOC="+maThuoc;
             Statement stm=conn.createStatement();
             int x=stm.executeUpdate(delete);
+            
+            String select="SELECT * FROM QLPK_THUOC";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            
+            tblModelThuoc.setRowCount(0);
+            while(rs.next()) {
+                Object[] objs ={rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5)};
+                tblModelThuoc.addRow(objs);
+            }
+            
+            
+            
             conn.close();
             return x;
         } catch (SQLException ex) {
@@ -349,7 +372,7 @@ public class BaseFrame extends javax.swing.JFrame {
             listNV.remove(location);
             location=-1;
             connect();
-            String delete="delete from SYS.QLPK_NHANVIEN where MANV="+manv;
+            String delete="delete from QLPK_NHANVIEN where MANV="+manv;
             Statement stm=conn.createStatement();
             int x=stm.executeUpdate(delete);
             conn.close();
@@ -383,7 +406,7 @@ public class BaseFrame extends javax.swing.JFrame {
             //String NgSinh=listNV.get(i).getNgSinh();
             
             String date=listNV.get(i).getNgSinh();
-            java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
+            java.util.Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
             java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
             
             String DiaChi=listNV.get(i).getDiaChi();
@@ -395,7 +418,7 @@ public class BaseFrame extends javax.swing.JFrame {
             long Luong=listNV.get(i).getLuong();
             connect();
             //update dtb
-            String update="update SYS.QLPK_NHANVIEN set HOTEN=?, NGAYSINH=?, GIOITINH=?, DIACHI=?,"
+            String update="update QLPK_NHANVIEN set HOTEN=?, NGAYSINH=?, GIOITINH=?, DIACHI=?,"
                     + "SDT=?, PHANQUYEN=?, CHUCDANH=?, MAPHONG=?,"
                     + "LUONG=? WHERE MANV="+MaNV;
             PreparedStatement pre=conn.prepareStatement(update);
@@ -455,7 +478,7 @@ public class BaseFrame extends javax.swing.JFrame {
             listBN.remove(location);
             location=-1;
             connect();
-            String delete="delete from SYS.QLPK_BENHNHAN where MABN="+mabn;
+            String delete="delete from QLPK_BENHNHAN where MABN="+mabn;
             Statement stm=conn.createStatement();
             int x=stm.executeUpdate(delete);
             
@@ -505,7 +528,7 @@ public class BaseFrame extends javax.swing.JFrame {
             String TenBN=listBN.get(i).getHoTen();
             
             String date=listBN.get(i).getNgaySinh();
-            java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
+            java.util.Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
             java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
             
             String DiaChi=listBN.get(i).getDiaChi();
@@ -514,7 +537,7 @@ public class BaseFrame extends javax.swing.JFrame {
             String SoDT=listBN.get(i).getSDT();
             connect();
             //update dtb
-            String update="update SYS.QLPK_BENHNHAN set HOTEN=?, NGAYSINH=?, GIOITINH=?, DIACHI=?,"
+            String update="update QLPK_BENHNHAN set HOTEN=?, NGAYSINH=?, GIOITINH=?, DIACHI=?,"
                     + "SDT=? WHERE MABN="+MaBN;
             PreparedStatement pre=conn.prepareStatement(update);
             
@@ -554,7 +577,7 @@ public class BaseFrame extends javax.swing.JFrame {
         ArrayList<BenhNhan> BenhNhansList = new ArrayList<>();
         try{
             connect();
-            String query2 = "SELECT * FROM SYS.QLPK_BENHNHAN";
+            String query2 = "SELECT * FROM QLPK_BENHNHAN";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             BenhNhan bn;
@@ -626,7 +649,7 @@ public class BaseFrame extends javax.swing.JFrame {
     public void updateCBBchuanDoan(){
         try{
             connect();
-            String query2 = "SELECT LOAIBENH FROM SYS.QLPK_LOAIBENH";
+            String query2 = "SELECT LOAIBENH FROM QLPK_LOAIBENH";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             while(rs.next()){          
@@ -641,7 +664,7 @@ public class BaseFrame extends javax.swing.JFrame {
     public void updateCBBbacSi(){
         try{
             connect();
-            String query2 = "SELECT * FROM SYS.QLPK_NHANVIEN";
+            String query2 = "SELECT * FROM QLPK_NHANVIEN";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             while(rs.next()){          
@@ -658,7 +681,7 @@ public class BaseFrame extends javax.swing.JFrame {
         ArrayList<Thuoc> ThuocsList = new ArrayList<>();
         try{
             connect();
-            String query2 = "SELECT * FROM SYS.QLPK_THUOC";
+            String query2 = "SELECT * FROM QLPK_THUOC";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             Thuoc thuoc;
@@ -707,29 +730,41 @@ public class BaseFrame extends javax.swing.JFrame {
     public int addThuoc(){
         try {
             int i=listThuoc.size()-1;
-            int STT=listThuoc.size();
-            int MaThuoc=listThuoc.get(i).getMaThuoc();
+            //int STT=listThuoc.size();
+            //int MaThuoc=listThuoc.get(i).getMaThuoc();
             String TenThuoc=listThuoc.get(i).getLoaiThuoc();
             String DonVi=listThuoc.get(i).getDonVi();
             int DonGia=listThuoc.get(i).getDonGia();
             String NoiSX=listThuoc.get(i).getNoiSX();
-            Object[] objs={STT, MaThuoc, TenThuoc, DonVi, DonGia,NoiSX};
-            
+            //Object[] objs={ STT, TenThuoc, DonVi, DonGia, NoiSX};
             //thêm vô csdl
             connect();
-            String insert="insert into SYS.QLPK_THUOC values(?,?,?,?,?)";
+            String insert="insert into QLPK_THUOC(LOAITHUOC,DONVI,DONGIA,NOISX) values(?,?,?,?)";
             PreparedStatement pre=conn.prepareStatement(insert);
+            
            
             //Nhập dữ liệu vô csdl
-            pre.setInt(1, MaThuoc);
-            pre.setString(2, TenThuoc);
-            pre.setString(3, DonVi);
-            pre.setInt(4, DonGia);
-            pre.setString(5, NoiSX);
-            int x=pre.executeUpdate();
+            //pre.setInt(1, MaThuoc);
+            pre.setString(1, TenThuoc);
+            pre.setString(2, DonVi);
+            pre.setInt(3, DonGia);
+            pre.setString(4, NoiSX);
+            int x = pre.executeUpdate();
             JOptionPane.showMessageDialog(this, x+" dòng đã được thêm vào csdl");
             
-            tblModelThuoc.addRow(objs);
+            String select="SELECT * FROM QLPK_THUOC";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            
+            tblModelThuoc.setRowCount(0);
+            while(rs.next()) {
+                Object[] objs ={rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5)};
+                tblModelThuoc.addRow(objs);
+            }
+            
+            
+            
+            
             conn.close();
             return 1;
         }catch (SQLException ex) {
@@ -762,7 +797,7 @@ public class BaseFrame extends javax.swing.JFrame {
             String NoiSX=listThuoc.get(i).getNoiSX();
             connect();
             //update dtb
-            String update="update SYS.QLPK_THUOC set LOAITHUOC=?, DONVI=?, DONGIA=?, NOISX=?  WHERE MATHUOC="+MaThuoc;
+            String update="update QLPK_THUOC set LOAITHUOC=?, DONVI=?, DONGIA=?, NOISX=?  WHERE MATHUOC="+MaThuoc;
             PreparedStatement pre=conn.prepareStatement(update);
             //Nhập dữ liệu vô csdl
             pre.setString(1, TenThuoc);
@@ -789,7 +824,7 @@ public class BaseFrame extends javax.swing.JFrame {
     public void updateCBBloaiThuoc(){
         try{
             connect();
-            String query2 = "SELECT LOAITHUOC FROM SYS.QLPK_THUOC";
+            String query2 = "SELECT LOAITHUOC FROM QLPK_THUOC";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             while(rs.next()){          
@@ -807,7 +842,7 @@ public class BaseFrame extends javax.swing.JFrame {
         }
         try{
             connect();
-            String query2 = "SELECT DISTINCT CHUANDOAN FROM SYS.QLPK_HOADON WHERE MABN="+txtMaBNKham.getText();
+            String query2 = "SELECT DISTINCT CHUANDOAN FROM QLPK_HOADON WHERE MABN="+txtMaBNKham.getText();
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             while(rs.next()){          
@@ -833,14 +868,14 @@ public class BaseFrame extends javax.swing.JFrame {
         else{
             try{
                 connect();
-                String getMaThuoc="select MATHUOC FROM SYS.QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
+                String getMaThuoc="select MATHUOC FROM QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
                 Statement stm=conn.createStatement();
                 ResultSet rs=stm.executeQuery(getMaThuoc);
                 while(rs.next()){
                     maThuoc=rs.getInt(1);
                 }
                 
-                String insert="insert into SYS.QLPK_TOATHUOC values(?,?,?,?,?,?)";
+                String insert="insert into QLPK_TOATHUOC values(?,?,?,?,?,?)";
                 PreparedStatement pre=conn.prepareStatement(insert);
                 
                 //Nhập dữ liệu vô csdl
@@ -886,7 +921,7 @@ public class BaseFrame extends javax.swing.JFrame {
         try {
             tblModelHoaDon=(DefaultTableModel)tblHoaDon.getModel();
             connect();
-            String query="select MAHD, MABN, MANV, THANHTIEN FROM SYS.QLPK_HOADON";
+            String query="select MAHD, MABN, MANV, THANHTIEN FROM QLPK_HOADON";
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(query);
             while(rs.next()){
@@ -902,7 +937,7 @@ public class BaseFrame extends javax.swing.JFrame {
         try {
             tblModelDoanhSoThuoc=(DefaultTableModel)tblDoanhSoThuoc.getModel();
             connect();
-            String query="select MATHUOC, DOANHTHU FROM SYS.QLPK_THUOC";
+            String query="select MATHUOC, DOANHTHU FROM QLPK_THUOC";
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(query);
             while(rs.next()){
@@ -961,7 +996,7 @@ public class BaseFrame extends javax.swing.JFrame {
     public void updateCBBNam(){
         try{
             connect();
-            String query2 = "SELECT DISTINCT EXTRACT(YEAR FROM NGAYKHAM) FROM SYS.QLPK_HOADON";
+            String query2 = "SELECT DISTINCT EXTRACT(YEAR FROM NGAYKHAM) FROM QLPK_HOADON";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             while(rs.next()){          
@@ -2569,7 +2604,7 @@ public class BaseFrame extends javax.swing.JFrame {
 
     private void jButtonNhanvienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNhanvienActionPerformed
         // TODO add your handling code here:
-        if(quanLy==1){
+        if(quanLy!=1){
             JOptionPane.showMessageDialog(panelKhamBenh, "Chỉ có quản lý mới được xem mục này");
         }
         else{
@@ -2705,7 +2740,7 @@ public class BaseFrame extends javax.swing.JFrame {
                     
                     connect();
                     try {
-                        String insert = "insert into SYS.QLPK_BENHNHAN values(?,?,?,?,?)";
+                        String insert = "insert into QLPK_BENHNHAN values(?,?,?,?,?)";
                         PreparedStatement st = conn.prepareStatement(insert);
                         st.setString(1, tenBN);
                         st.setDate(2, sqlDate);
@@ -2787,7 +2822,7 @@ public class BaseFrame extends javax.swing.JFrame {
             // TODO add your handling code here:
             //String maHD= txtTimMaHD.getText();
             int mahd=Integer.parseInt(txtTimMaHD.getText());
-            String query="select MAHD from SYS.QLPK_TOATHUOC WHERE MAHD="+mahd;
+            String query="select MAHD from QLPK_TOATHUOC WHERE MAHD="+mahd;
             
             connect();
             Statement stt=conn.createStatement();
@@ -2831,7 +2866,7 @@ public class BaseFrame extends javax.swing.JFrame {
             int mahd=Integer.parseInt(txtMaHD.getText());
             connect();
             int manv=0;
-            String getMaNV="select MANV FROM SYS.QLPK_NHANVIEN WHERE HOTEN='"+bacSiKham+"'";
+            String getMaNV="select MANV FROM QLPK_NHANVIEN WHERE HOTEN='"+bacSiKham+"'";
             Statement st=conn.createStatement();
             ResultSet rs=st.executeQuery(getMaNV);
             while(rs.next()){
@@ -2840,7 +2875,7 @@ public class BaseFrame extends javax.swing.JFrame {
             conn.close();
             
             connect();
-            String query="UPDATE SYS.QLPK_HOADON SET MANV=?, TRIEUCHUNG=?, CHUANDOAN=?  WHERE MAHD="+mahd;
+            String query="UPDATE QLPK_HOADON SET MANV=?, TRIEUCHUNG=?, CHUANDOAN=?  WHERE MAHD="+mahd;
             PreparedStatement pre=conn.prepareStatement(query);
             pre.setInt(1, manv);
             pre.setString(2, trieuChung);
@@ -2851,7 +2886,7 @@ public class BaseFrame extends javax.swing.JFrame {
             
             String diaChi="";
             String gioiTinh="";
-            String query1="select GIOITINH, DIACHI FROM SYS.QLPK_BENHNHAN WHERE MABN="+txtMaBNKham.getText();
+            String query1="select GIOITINH, DIACHI FROM QLPK_BENHNHAN WHERE MABN="+txtMaBNKham.getText();
             Statement stm=conn.createStatement();
             ResultSet rss=stm.executeQuery(query1);
             while(rss.next()){
@@ -2917,7 +2952,7 @@ public class BaseFrame extends javax.swing.JFrame {
     private void btTimPKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTimPKActionPerformed
         try {
             connect();
-            String query="SELECT H.MABN, B.HOTEN, H.LIDOKHAM FROM SYS.QLPK_HOADON H, SYS.QLPK_BENHNHAN B WHERE H.MABN=B.MABN AND H.MAHD="+txtTimMaPK.getText();
+            String query="SELECT H.MABN, B.HOTEN, H.LIDOKHAM FROM QLPK_HOADON H, QLPK_BENHNHAN B WHERE H.MABN=B.MABN AND H.MAHD="+txtTimMaPK.getText();
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(query);
             if(!rs.isBeforeFirst()){
@@ -2961,7 +2996,7 @@ public class BaseFrame extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         try {
             int maThuoc = Integer.parseInt(txtTimMaThuoc.getText());
-            String sql="SELECT MATHUOC FROM SYS.QLPK_THUOC WHERE MATHUOC="+maThuoc;
+            String sql="SELECT MATHUOC FROM QLPK_THUOC WHERE MATHUOC="+maThuoc;
             connect();
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(sql);
@@ -2990,7 +3025,7 @@ public class BaseFrame extends javax.swing.JFrame {
         try {
             int maNV=Integer.parseInt(txtTimMaNV.getText());
 
-            String sql="SELECT MANV FROM SYS.QLPK_NHANVIEN WHERE MANV="+maNV;
+            String sql="SELECT MANV FROM QLPK_NHANVIEN WHERE MANV="+maNV;
             connect();
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(sql);
@@ -3021,7 +3056,7 @@ public class BaseFrame extends javax.swing.JFrame {
         //boolean flag = true;
         try {
                 int maBN = Integer.parseInt(txtTimBenhNhan.getText());
-                String sql="SELECT MABN FROM SYS.QLPK_BENHNHAN WHERE MABN="+maBN;
+                String sql="SELECT MABN FROM QLPK_BENHNHAN WHERE MABN="+maBN;
 
                 connect();
                 Statement stm=conn.createStatement();
@@ -3055,7 +3090,7 @@ public class BaseFrame extends javax.swing.JFrame {
         try {
             if(flag == true){
                 int maBN = Integer.parseInt(txtTimMaBN.getText());
-                String sql="SELECT MABN FROM SYS.QLPK_BENHNHAN WHERE MABN="+maBN;
+                String sql="SELECT MABN FROM QLPK_BENHNHAN WHERE MABN="+maBN;
 
                 connect();
                 Statement stm=conn.createStatement();
@@ -3089,7 +3124,7 @@ public class BaseFrame extends javax.swing.JFrame {
             String loaiThuoc=cbbLoaiThuoc.getSelectedItem().toString();
             connect();
             String donvi="";
-            String getMaThuoc="select DONVI FROM SYS.QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
+            String getMaThuoc="select DONVI FROM QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(getMaThuoc);
             while(rs.next()){
@@ -3165,7 +3200,7 @@ public class BaseFrame extends javax.swing.JFrame {
             conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             conn.setAutoCommit(false);
             String query="SELECT MAHD, NGAYKHAM, THANHTIEN " +
-                    "FROM SYS.QLPK_HOADON " +
+                    "FROM QLPK_HOADON " +
                     "WHERE EXTRACT(YEAR FROM NGAYKHAM)=" + txtYear.getSelectedItem().toString()+
                     " AND EXTRACT(MONTH FROM NGAYKHAM)=" + cbbMonth.getSelectedItem().toString();
             Statement stm=conn.createStatement();
@@ -3179,7 +3214,7 @@ public class BaseFrame extends javax.swing.JFrame {
             }
             
             String query2="SELECT SUM(THANHTIEN) " +
-                    "FROM SYS.QLPK_HOADON " +
+                    "FROM QLPK_HOADON " +
                     "WHERE EXTRACT(YEAR FROM NGAYKHAM)=" + txtYear.getSelectedItem().toString() +
                     " AND EXTRACT(MONTH FROM NGAYKHAM)=" + cbbMonth.getSelectedItem().toString();
             //Statement stm1=conn.createStatement();

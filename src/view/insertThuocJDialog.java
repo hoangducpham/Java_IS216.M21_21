@@ -19,7 +19,7 @@ import model.Thuoc;
 
 /**
  *
- * @author Admin
+ * @author KhaiTruong_18520878
  */
 public class insertThuocJDialog extends javax.swing.JDialog {
     private BaseFrame home;
@@ -31,7 +31,7 @@ public class insertThuocJDialog extends javax.swing.JDialog {
     public void connect(){
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"DOAN_ORACLE","admin");
+            conn=DriverManager.getConnection(url,"system","khaitruong190220");
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -39,15 +39,15 @@ public class insertThuocJDialog extends javax.swing.JDialog {
     
     public void setMaThuoc(){
         try {
-            int maThuoc=0;
+            int maThuoc = 0;
             connect();
-            String query = "SELECT GET_MATHUOC FROM DUAL";
+            String query = "SELECT MATHUOC FROM QLPK_THUOC";
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(query);
             while(rs.next()){
-                maThuoc=rs.getInt(1);
+                maThuoc = rs.getInt(1);
             }
-            txtMaThuoc.setText(maThuoc+"");
+            txtMaThuoc.setText(maThuoc+1+"");
             conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -67,11 +67,11 @@ public class insertThuocJDialog extends javax.swing.JDialog {
 //----------------------------------------Thêm thuốc-----------------------------------------------------------------------
     public int inputThuoc(){
         //int maNV=1;
-        int maThuoc=Integer.parseInt(txtMaThuoc.getText());
+        int maThuoc = Integer.parseInt(txtMaThuoc.getText());
         
-        String tenThuoc=txtTenThuoc.getText().toUpperCase();
+        String tenThuoc = txtTenThuoc.getText().toUpperCase();
         try {
-            String donVi=cbbDonVi.getSelectedItem().toString();
+            String donVi = cbbDonVi.getSelectedItem().toString();
             String noiSX=txtNoiSX.getText().toUpperCase();
             int donGia=Integer.parseInt(txtDonGia.getText());
             if(tenThuoc.equals("")==true || noiSX.equals("")==true){
@@ -121,6 +121,7 @@ public class insertThuocJDialog extends javax.swing.JDialog {
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel6.setText("Mã thuốc");
 
+        txtMaThuoc.setEditable(false);
         txtMaThuoc.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -147,7 +148,6 @@ public class insertThuocJDialog extends javax.swing.JDialog {
         jLabel7.setText("Nơi SX");
 
         btThem.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        btThem.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\add-icon.png")); // NOI18N
         btThem.setText("Thêm thuốc");
         btThem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -156,7 +156,6 @@ public class insertThuocJDialog extends javax.swing.JDialog {
         });
 
         btThoat.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        btThoat.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\close.png")); // NOI18N
         btThoat.setText("Hủy bỏ");
 
         cbbDonVi.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -175,7 +174,7 @@ public class insertThuocJDialog extends javax.swing.JDialog {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -50,20 +50,19 @@ public class loginFrame extends javax.swing.JFrame {
         
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            Connection conn = DriverManager.getConnection(url, "system","user_java123");
-            String query1="SELECT USERNAME, PASSWORD, PHANQUYEN FROM SYS.QLPK_NHANVIEN";
-            Statement stm=conn.createStatement();
-            ResultSet rs=stm.executeQuery(query1);
+            Connection conn = DriverManager.getConnection(url, "system","khaitruong190220");
+            String query1 = "SELECT USERNAME, PASSWORD, PHANQUYEN FROM QLPK_NHANVIEN";
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery(query1);
+            
             
             while(rs.next()){
-//                String username="";
-//                String password="";
-//                int phanQuyen=0;
-                String username=rs.getString(1);
-                String password=rs.getString(2);
-                int phanQuyen=rs.getInt(3);
+                String username = rs.getString(1);
+                String password = rs.getString(2);
+                System.out.print(username);
+                int phanQuyen = rs.getInt(3);
                 String passText = new String(txtPassword.getPassword());
-                if(username.equals(txtUsername.getText().toString())==true && password.equals(passText)==true){
+                if(username.equals(txtUsername.getText())==true && password.equals(passText)==true){
                     us=new User(username, password, phanQuyen);
                     return 1;
                 }
