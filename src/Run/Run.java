@@ -12,7 +12,9 @@ import view.loginFrame;
 
 /**
  *
- * @author HP       
+ * 
+ * @author An Phan       
+ * 
  */
 public class Run {
     public static void main(String[] args) {

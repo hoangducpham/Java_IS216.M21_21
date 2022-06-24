@@ -32,11 +32,10 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
 
 public class InserpkJdialog extends javax.swing.JDialog {
-
-    
     private BaseFrame home;
-    private int maPK=0;
+    private int maPK = 0;
     private Connection conn;
+    
     public InserpkJdialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -44,40 +43,19 @@ public class InserpkJdialog extends javax.swing.JDialog {
         home = (BaseFrame) parent;
         this.setTitle("Nhập thông tin phiếu khám");
         this.setLocationRelativeTo(null);
-        setMaPK();
-        txtMaPK.setEditable(false);
-        txtMaPK.setText(maPK+"");
         txtMaBN.setEditable(false);
         txtMaBN.setText(home.getMaBN()+"");
-        
     }
 
     public void connect(){
         try {
-            String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"DOAN_ORACLE","admin");
+            String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+            conn = DriverManager.getConnection(url, "system", "user_java123");
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void setMaPK(){
-        try {
-            connect();
-            String query = "SELECT GET_MAHD FROM DUAL";
-            Statement stm=conn.createStatement();
-            ResultSet rs=stm.executeQuery(query);
-            while(rs.next()){
-                maPK=rs.getInt(1);
-            }
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -85,8 +63,6 @@ public class InserpkJdialog extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        txtMaPK = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtMaBN = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
@@ -108,7 +84,7 @@ public class InserpkJdialog extends javax.swing.JDialog {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
+                .addGap(15, 15, 15)
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -122,11 +98,6 @@ public class InserpkJdialog extends javax.swing.JDialog {
 
         jPanel2.setBackground(new java.awt.Color(204, 204, 255));
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel2.setText("Mã phiếu khám");
-
-        txtMaPK.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel4.setText("Mã bệnh nhân");
 
@@ -138,7 +109,6 @@ public class InserpkJdialog extends javax.swing.JDialog {
         txtLiDoKham.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
 
         btThem.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        btThem.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\add-icon.png")); // NOI18N
         btThem.setText("Thêm");
         btThem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -147,7 +117,6 @@ public class InserpkJdialog extends javax.swing.JDialog {
         });
 
         btThoat.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        btThoat.setIcon(new javax.swing.ImageIcon("D:\\Java\\JavaPhongMT\\src\\images\\Exit-icon.png")); // NOI18N
         btThoat.setText("Thoát");
         btThoat.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -161,48 +130,39 @@ public class InserpkJdialog extends javax.swing.JDialog {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtMaPK, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtLiDoKham))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
-                        .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                            .addComponent(btThem)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btThoat))
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(32, 32, 32)
-                            .addComponent(txtLiDoKham, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 1, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btThem)
+                        .addGap(18, 18, 18)
+                        .addComponent(btThoat)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(45, 45, 45)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4)))
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel2)
-                        .addComponent(txtMaPK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(15, 15, 15)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtLiDoKham, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
+                    .addComponent(jLabel6)
+                    .addComponent(txtLiDoKham, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btThem)
                     .addComponent(btThoat))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -228,16 +188,16 @@ public class InserpkJdialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btThoatActionPerformed
 
     private void btThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btThemActionPerformed
-        String liDoKham=txtLiDoKham.getText();
-        if(txtMaPK.getText().equals("")||txtMaBN.getText().equals("")||txtLiDoKham.getText().equals("")){
+        String liDoKham = txtLiDoKham.getText();
+        if(txtMaBN.getText().equals("") || txtLiDoKham.getText().equals("")){
             JOptionPane.showMessageDialog(this, "Bạn hãy điền đầy đủ thông tin");
         }
         else{
             try {
                 java.util.Date today = new java.util.Date();
-                DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 String ngayKham = dateFormat.format(today);
-                java.util.Date date2 = new SimpleDateFormat("MMM d, yyyy").parse(ngayKham);
+                java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(ngayKham);
                 java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
                 
                 connect();
@@ -247,17 +207,12 @@ public class InserpkJdialog extends javax.swing.JDialog {
                     Logger.getLogger(InserpkJdialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
-                    String insert = "insert into HOADON values(?,?,?,?,?,?,?,?,?)";
+                    String insert = "insert into SYS.QLPK_HOADON(MaBN, MaNV, LiDoKham, NgayKham) values(?,?,?,?)";
                     PreparedStatement st = conn.prepareStatement(insert);
-                    st.setInt(1, maPK);
-                    st.setInt(2, home.getMaBN());
-                    st.setInt(3, 0);
-                    st.setString(4, liDoKham);
-                    st.setString(5, "");
-                    st.setString(6, "");
-                    st.setInt(7, 30000);
-                    st.setInt(8, 30000);
-                    st.setDate(9, sqlDate);
+                    st.setInt(1, home.getMaBN());
+                    st.setInt(2, 1);
+                    st.setString(3, liDoKham);
+                    st.setDate(4, sqlDate);
                     
                     int x = st.executeUpdate();
                     if(x > 0){
@@ -267,16 +222,25 @@ public class InserpkJdialog extends javax.swing.JDialog {
                     }
                     
                 String tenBN = "";
-                String sql = "Select HOTEN From BENHNHAN Where MABN="+txtMaBN.getText();
+                String sql = "Select HOTEN From SYS.QLPK_BENHNHAN Where MABN="+txtMaBN.getText();
                 Statement stm = conn.createStatement();
                 ResultSet rs = stm.executeQuery(sql);
                 while(rs.next()){
                     tenBN = rs.getString(1);
                 }
+                
+                String maPK = "";
+                sql = "SELECT MAX(MaHD) FROM SYS.QLPK_HOADON";
+                Statement stm2 = conn.createStatement();
+                ResultSet rs2 = stm2.executeQuery(sql);
+                while(rs2.next()){
+                    maPK = rs2.getString(1);
+                }
+                
                 try{
                     Map<String, Object> parameters = new HashMap<String, Object>();
-                    JasperDesign jdesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\report2.jrxml");
-                    parameters.put("maPK", txtMaPK.getText());
+                    JasperDesign jdesign = JRXmlLoader.load("C:\\Users\\T470\\Documents\\Java\\DoAn\\Java_IS216.M21_21\\src\\report\\report2.jrxml");
+                    parameters.put("maPK", maPK);
                     parameters.put("maBN", txtMaBN.getText());
                     parameters.put("LiDo", txtLiDoKham.getText());
                     parameters.put("tenBN", tenBN);
@@ -343,13 +307,11 @@ public class InserpkJdialog extends javax.swing.JDialog {
     private javax.swing.JButton btThem;
     private javax.swing.JButton btThoat;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField txtLiDoKham;
     private javax.swing.JTextField txtMaBN;
-    private javax.swing.JTextField txtMaPK;
     // End of variables declaration//GEN-END:variables
 }

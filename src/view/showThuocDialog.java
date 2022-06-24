@@ -251,9 +251,9 @@ public class showThuocDialog extends javax.swing.JDialog {
                     .addComponent(txtNoiSX, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btXoa, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btXoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btCapNhat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btThoat, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btThoat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -265,7 +265,7 @@ public class showThuocDialog extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -275,16 +275,14 @@ public class showThuocDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         if(vien.isSelected()){
             chai.setSelected(false);
-            //txtGioiTinh.setText("FEMALE");
-            donVi="Vien";
+            donVi = "Vien";
         }
     }//GEN-LAST:event_vienActionPerformed
 
     private void chaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chaiActionPerformed
         // TODO add your handling code here:
         if(chai.isSelected()){
-            chai.setSelected(false);
-            //txtGioiTinh.setText("FEMALE");
+            vien.setSelected(true);
             donVi="Chai";
         }
     }//GEN-LAST:event_chaiActionPerformed

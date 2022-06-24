@@ -156,7 +156,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="f8" green="f0" red="ca" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="PH&#xd2;NG M&#x1ea0;CH T&#x1af; ABC"/>
+            <Property name="text" type="java.lang.String" value="PH&#xd2;NG M&#x1ea0;CH T&#x1af; UIT"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">

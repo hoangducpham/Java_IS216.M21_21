@@ -57,39 +57,68 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author MyPC
+ * @author An Phan
  */
 public class BaseFrame extends javax.swing.JFrame {
     User us = new User();
     int quanLy = 0;
-    
+    int location = -1;
+    private Connection conn;
+    private PlaceHolder p1, p2, p3;
+
+    // SET METHOD
     public void setUser(User us){
         this.us = us;
         quanLy = us.getPhanQuyen();
     }
     
     
-    int location=-1;
-    private PlaceHolder p1, p2, p3;
+    // GET METHOD
     public int getlocation(){
         return location;
     }
     
     public void resetLocation(){
-        location=-1;
+        location = -1;
     }
     
- 
-//--------------------------------------------------------------------------Nhân viên--------------------------------------------
-    ArrayList<NhanVien> listNV= nhanVienList();
-    private int maNhanVien=0;
-    public int getMaNhanVien(){
-        return maNhanVien;
+    // Hàm khởi tạo mặc định
+    public BaseFrame() {
+        initComponents();
+        setTitle("Quản lí phòng mạch tư");
+        editImageFrame(); // Chèn hình
+        show_nhanVien();
+        panelNhanVien.setVisible(false);
+        show_BenhNhan();
+        show_BN();
+        show_Thuoc();
+        show_KhamBenh();
+        showThongKe();
+        panelThongKe.setVisible(false);
+        this.setSize(1006, 520);
+        setColor(pnBttTiepNhan);
     }
-    //nhập các nhân viên từ database vào list
-    public ArrayList<NhanVien> nhanVienList(){
-        ArrayList<NhanVien> nhanViensList=new ArrayList<>();
+    
+    // Hàm connect database
+    public void connect(){
+        try {
+            String url = "jdbc:oracle:thin:@localhost:1521:orcl";
+            conn = DriverManager.getConnection(url, "system", "user_java123");
+        } catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+ 
+    /*---------- NHANVIEN ----------*/
+    ArrayList<NhanVien> listNV = getListNVDatabase();
+    private int maNhanVien = 0;
+    private DefaultTableModel tblModelNhanVien;
+    
+    // Lấy các nhân viên từ database vào list
+    public ArrayList<NhanVien> getListNVDatabase(){
+        ArrayList<NhanVien> nvList = new ArrayList<>();
         String url="jdbc:oracle:thin:@localhost:1521:orcl";
+        
         try{
             Connection conn = DriverManager.getConnection(url,"system","user_java123");
             String query1 = "SELECT MaNV, HoTen, to_char(NgaySinh, 'yyyy/mm/dd') as NgaySinh, DiaChi, GioiTinh, SDT, ChucDanh, MaPhong, Luong "
@@ -99,14 +128,9 @@ public class BaseFrame extends javax.swing.JFrame {
             NhanVien nv;
             while(rs.next()){
 //                Date ngaySinh = rs.getDate("NGAYSINH");
-//              Date date=(Date) new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(ngaySinh);
+//                Date date=(Date) new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").parse(ngaySinh);
 //                DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");  
 //                String strDate = dateFormat.format(ngaySinh);
-
-//                System.out.println(rs.getString("NgaySinh"));
-//                System.out.println(rs.getString("HoTen"));
-//                String strDate = "10-11-2000";
-                
                 
                 nv = new NhanVien(
                             rs.getInt("MANV"),
@@ -119,95 +143,31 @@ public class BaseFrame extends javax.swing.JFrame {
                             rs.getString("MAPHONG"),
                             rs.getLong("LUONG")
                 );
-                nhanViensList.add(nv);
+                nvList.add(nv);
             }
             conn.close();
-        }catch(SQLException e){
+        }
+        catch(SQLException e){
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Không connect được database");
         }
-//        catch (ParseException ex) {
-//            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-        return nhanViensList;
-        //conn.close();
+        
+        return nvList;
     }
     
-    private DefaultTableModel tblModelNhanVien;
-    public ArrayList<NhanVien> getList(){
+    // Lấy danh sách nhân viên
+    public ArrayList<NhanVien> getListNV(){
         return listNV;
     }
     
-    //lấy nhân viên sau khi tìm kiếm
-    public NhanVien getNhanVien(){
-        return listNV.get(location);
-    }
-    
-    public Thuoc getThuoc(){
-        return listThuoc.get(location);
-    }
-    
-    public void findNhanVien(int maNV){
-        for(int i=0; i<listNV.size(); i++){
-            if(listNV.get(i).getMaNV()==maNV){
-                location=i;
-                //JOptionPane.showMessageDialog(panelKhamBenh, i);
-            }
-        }
-    }
-    
-    public BenhNhan getBenhNhan(){
-        return listBN.get(location);
-    }
-    
-    
-    public void findBenhNhan(int maBN){
-        for(int i=0; i<listBN.size(); i++){
-            if(listBN.get(i).getMaBN() == maBN){
-                location = i;
-            }
-        }
-    }
-    
-    public void findThuoc(int mathuoc){
-        for(int i=0; i<listThuoc.size(); i++){
-            if(listThuoc.get(i).getMaThuoc() == mathuoc){
-                location = i;
-            }
-        }
-    }
-    
-    private Connection conn;
-    public void connect(){
-        try {
-            String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"system","user_java123");
-        } catch (SQLException ex) {
-            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-        
-    
-    //tìm kiếm vị trí nhân viên
-    public int searchNhanVien(ArrayList<NhanVien> arr, long target) {
-        for(int i=0; i<arr.size(); i++){
-            int x=arr.get(i).getMaNV();
-            if (x==target) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
-    
-    //sau khi nhập database và list, ta fetch data vào table để hiển thị ra màn hình
+    // Sau khi nhập database và list, ta fetch data từ list vào table để hiển thị ra màn hình
     public void show_nhanVien(){
         tblModelNhanVien = (DefaultTableModel)tblNhanVien.getModel();
         tblModelNhanVien.setRowCount(0);
-        int j=1;
-        for(int i=0; i<listNV.size();i++){
+        int j = 1;
+        for(int i = 0; i < listNV.size(); i++){
             Object[] row={
-                j,
+                j, // STT
                 listNV.get(i).getMaNV(),
                 listNV.get(i).getTenNV(),
                 listNV.get(i).getNgSinh(),
@@ -223,41 +183,68 @@ public class BaseFrame extends javax.swing.JFrame {
         }
         setVisible(true);
     }
-   
-    //sau khi thêm thông tin nhân viên ở insertNhanVienDialog, ta insert dữ liệu đó vào list và database, sau đó add nhân viên vào table
+    
+    public int getMaNV(){
+        return maNhanVien;
+    }
+    
+    // Lấy nhân viên với location
+    public NhanVien getNV(){
+        return listNV.get(location);
+    }
+    
+    public void findNhanVien(int maNV){
+        for(int i = 0; i < listNV.size(); i++){
+            if(listNV.get(i).getMaNV() == maNV){
+                location = i;
+            }
+        }
+    }
+    
+    // Tìm kiếm vị trí nhân viên
+    public int searchNhanVien(ArrayList<NhanVien> arr, long target) {
+        for(int i=0; i < arr.size(); i++){
+            int x = arr.get(i).getMaNV();
+            if (x == target) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     public int addNhanVien(){
         try {
             //DefaultTableModel tblModelNhanVien =(DefaultTableModel)tblNhanVien.getModel();
-            tblModelNhanVien=(DefaultTableModel)tblNhanVien.getModel();
-            int i = listNV.size()-1;
-            int MaNV=listNV.get(i).getMaNV();
-            String TenNV=listNV.get(i).getTenNV();
+            tblModelNhanVien = (DefaultTableModel)tblNhanVien.getModel();
+            int i           = listNV.size()- 1;
+            // int MaNV        = listNV.get(i).getMaNV();
+            String TenNV    = listNV.get(i).getTenNV();
+            String DiaChi   = listNV.get(i).getDiaChi();
+            String GioiTinh = listNV.get(i).getGioiTinh();
+            String SoDT     = listNV.get(i).getSoDT();
+            String ChucDanh = listNV.get(i).getChucDanh();
+            int MaPhong     = Integer.parseInt(listNV.get(i).getMaPhong());
+            long Luong      = listNV.get(i).getLuong();
             
-            String date=listNV.get(i).getNgSinh();
+            String date = listNV.get(i).getNgSinh();
             java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
             
-            String DiaChi=listNV.get(i).getDiaChi();
-            String GioiTinh=listNV.get(i).getGioiTinh();
-            String SoDT=listNV.get(i).getSoDT();
-            String ChucDanh=listNV.get(i).getChucDanh();
-            int MaPhong=Integer.parseInt(listNV.get(i).getMaPhong());
-            long Luong= listNV.get(i).getLuong();
-            //thêm vô csdl
-            connect();
-            String insert="insert into SYS.QLPK_NHANVIEN(HOTEN,NGAYSINH,GIOITINH,SDT,DIACHI,CHUCDANH,PHANQUYEN,MAPHONG,LUONG) values(?,?,?,?,?,?,?,?,?)";
-            PreparedStatement pre=conn.prepareStatement(insert);
-            int phanQuyen = 1;
+            int phanQuyen = 2;
             if(ChucDanh.equalsIgnoreCase("nhan vien"))
-                phanQuyen=2;
+                phanQuyen = 2;
             else if (ChucDanh.equalsIgnoreCase("quan ly"))
-                phanQuyen=1;
+                phanQuyen = 1;
             else{
                 JOptionPane.showMessageDialog(panelKhamBenh, "Nhập chức danh là nhan vien hoặc quan ly");
                 return 0;
             }
             
-            //Nhập dữ liệu vô csdl
+            // Thêm vô csdl
+            connect();
+            String insert = "insert into SYS.QLPK_NHANVIEN(HOTEN,NGAYSINH,GIOITINH,SDT,DIACHI,CHUCDANH,PHANQUYEN,MAPHONG,LUONG) values(?,?,?,?,?,?,?,?,?)";
+            PreparedStatement pre = conn.prepareStatement(insert);
+            
             pre.setString(1, TenNV);
             pre.setDate(2, sqlDate);
             pre.setString(3, GioiTinh);
@@ -268,45 +255,81 @@ public class BaseFrame extends javax.swing.JFrame {
             pre.setInt(8, MaPhong);
             pre.setLong(9, Luong);
             int x = pre.executeUpdate();
-            JOptionPane.showMessageDialog(panelKhamBenh, x+" dòng đã được thêm vào csdl");
-            
-//            String select = "SELECT * FROM SYS.QLPK_NHANVIEN";
-//            Statement statement = conn.createStatement();
-//            ResultSet rs = statement.executeQuery(select);
-//            
-//            tblModelNhanVien.setRowCount(0);
-//            int STT = 1;
-//            while(rs.next()) {
-//                Object[] objs={
-//                    STT,
-//                    rs.getInt("MANV"),
-//                    rs.getString("HOTEN"),
-//                    rs.getDate("NGAYSINH"),
-//                    rs.getString("DIACHI"),
-//                    rs.getString("GIOITINH"),
-//                    rs.getString("SDT"),
-//                    rs.getString("CHUCDANH"),
-//                    rs.getInt("MAPHONG"),
-//                    rs.getLong("LUONG")
-//                };
-//                tblModelNhanVien.addRow(objs);
-//                STT++;
-//            }
-            
-            this.listNV = nhanVienList();
+            JOptionPane.showMessageDialog(panelKhamBenh, x + " dòng đã được thêm vào csdl");
+            this.listNV = getListNVDatabase();
             show_nhanVien();
-            
-            //Object[] objs={STT, MaNV, TenNV, NgSinh, DiaChi, GioiTinh ,SoDT, ChucDanh, MaPhong,Luong};
-            //tblModelNhanVien.addRow(objs);
             conn.close();
             return 1;
-        }catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
             return 0;
-        }catch (ParseException ex){
+        }
+        catch (ParseException ex){
             //Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi convert dữ liệu Ngày sinh");
+            return 0;
+        }
+    }
+    
+    public int updateNhanVien(){
+        try {
+            //Gán thông tin cho biến
+            int i = location;
+            int MaNV        = listNV.get(i).getMaNV();
+            String TenNV    = listNV.get(i).getTenNV();
+            String DiaChi   = listNV.get(i).getDiaChi();
+            String GioiTinh = listNV.get(i).getGioiTinh();
+            String SoDT     = listNV.get(i).getSoDT();
+            String ChucDanh = listNV.get(i).getChucDanh();
+            int MaPhong     = Integer.parseInt(listNV.get(i).getMaPhong());
+            long Luong      = listNV.get(i).getLuong();
+            
+            String date = listNV.get(i).getNgSinh();
+            java.util.Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+            java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
+            
+            int phanQuyen = 2;
+            if(ChucDanh.equalsIgnoreCase("nhan vien"))
+                phanQuyen = 1;
+            else if (ChucDanh.equalsIgnoreCase("quan ly"))
+                phanQuyen = 2;
+            else{
+                JOptionPane.showMessageDialog(panelKhamBenh, "Nhập chức danh là nhan vien hoặc quan ly");
+                return 0;
+            }
+            
+            connect();
+            String update="update SYS.QLPK_NHANVIEN set HOTEN=?, NGAYSINH=?, GIOITINH=?, DIACHI=?,"
+                    + "SDT=?, PHANQUYEN=?, CHUCDANH=?, MAPHONG=?,"
+                    + "LUONG=? WHERE MANV="+MaNV;
+            PreparedStatement pre=conn.prepareStatement(update);
+
+            pre.setString(1, TenNV);
+            pre.setDate(2, sqlDate);
+            pre.setString(3, GioiTinh);
+            pre.setString(4, DiaChi);
+            pre.setString(5, SoDT);
+            pre.setInt(6, phanQuyen);
+            pre.setString(7, ChucDanh);
+            pre.setInt(8, MaPhong);
+            pre.setLong(9, Luong);
+            int x = pre.executeUpdate();
+            JOptionPane.showMessageDialog(panelKhamBenh, x + " dòng đã được cập nhật");
+            conn.close();
+            
+            updateNhanVienJtable(location);
+            location = -1;
+            return 1;
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
+            return 0;
+        }
+        catch (ParseException ex){
+            JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi convert dữ liệu Ngày sinh");
             return 0;
         }
     }
@@ -315,69 +338,17 @@ public class BaseFrame extends javax.swing.JFrame {
         try {
             tblModelNhanVien.removeRow(location);
             listNV.remove(location);
-            location=-1;
-//            String url="jdbc:oracle:thin:@localhost:1521:orcl";
-//            Connection conn=DriverManager.getConnection(url,"system","user_java123");
+            location = -1;
+
             connect();
-            String delete="delete from SYS.QLPK_NHANVIEN where MANV="+manv;
-            Statement stm=conn.createStatement();
-            int x=stm.executeUpdate(delete);
+            String delete = "delete from SYS.QLPK_NHANVIEN where MANV="+manv;
+            Statement stm = conn.createStatement();
+            int x = stm.executeUpdate(delete);
             txtTimMaNV.setText(""); 
             conn.close();
             return x;
-        } catch (SQLException ex) {
-            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Lỗi kết nối csdl");
-            return 0;
-        }  
-    }
-    
-    public int deleteBenhNhan(int mabn){
-        try {
-            tblModelBN.removeRow(location);
-            listBN.remove(location);
-            location=-1;
-//            String url="jdbc:oracle:thin:@localhost:1521:orcl";
-//            Connection conn=DriverManager.getConnection(url,"system","user_java123");
-            connect();
-            String delete="delete from SYS.QLPK_BENHNHAN where MABN="+mabn;
-            Statement stm=conn.createStatement();
-            int x=stm.executeUpdate(delete);
-            conn.close();
-            return x;
-        } catch (SQLException ex) {
-            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, "Lỗi kết nối csdl");
-            return 0;
-        }  
-    }
-    
-    
-    public int deleteThuoc(int maThuoc){
-        try {
-            //tblModelThuoc.removeRow(location);
-            //listThuoc.remove(location);
-            //location=-1;
-            connect();
-            String delete="delete from SYS.QLPK_THUOC where MATHUOC="+maThuoc;
-            Statement stm=conn.createStatement();
-            int x=stm.executeUpdate(delete);
-            
-            String select="SELECT * FROM SYS.QLPK_THUOC";
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery(select);
-            
-            tblModelThuoc.setRowCount(0);
-            while(rs.next()) {
-                Object[] objs ={rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5)};
-                tblModelThuoc.addRow(objs);
-            }
-            
-            
-            
-            conn.close();
-            return x;
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, "Lỗi kết nối csdl");
             return 0;
@@ -388,14 +359,16 @@ public class BaseFrame extends javax.swing.JFrame {
         try {
             tblModelNhanVien.removeRow(location);
             listNV.remove(location);
-            location=-1;
+            location = -1;
+            
             connect();
             String delete="delete from SYS.QLPK_NHANVIEN where MANV="+manv;
             Statement stm=conn.createStatement();
             int x=stm.executeUpdate(delete);
             conn.close();
             return x;
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
             return 0;   
@@ -413,71 +386,105 @@ public class BaseFrame extends javax.swing.JFrame {
         tblModelNhanVien.setValueAt(listNV.get(loca).getLuong(), loca, 9);
     }
     
-    public int updateNhanVien(){
+    
+    
+    
+    
+    public Thuoc getThuoc(){
+        return listThuoc.get(location);
+    }
+    
+    public void findThuoc(int mathuoc){
+        for(int i=0; i<listThuoc.size(); i++){
+            if(listThuoc.get(i).getMaThuoc() == mathuoc){
+                location = i;
+            }
+        }
+    }
+    
+    public BenhNhan getBenhNhan(){
+        return listBN.get(location);
+    }
+ 
+    public void findBenhNhan(int maBN){
+        for(int i=0; i<listBN.size(); i++){
+            if(listBN.get(i).getMaBN() == maBN){
+                location = i;
+            }
+        }
+    }
+    
+    
+    public int deleteBenhNhan(int mabn){
         try {
-            //Gán thông tin cho biến
-            int i=location;
-            //int STT=listNV.size();
-            int MaNV=listNV.get(i).getMaNV();
-            String TenNV=listNV.get(i).getTenNV();
-            //String NgSinh=listNV.get(i).getNgSinh();
-            //String NgSinh=listNV.get(i).getNgSinh();
+            tblModelBN.removeRow(location);
+            listBN.remove(location);
+            location=-1;
             
-            String date=listNV.get(i).getNgSinh();
-            java.util.Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
-            java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
-            
-            String DiaChi=listNV.get(i).getDiaChi();
-            String GioiTinh=listNV.get(i).getGioiTinh();
-            
-            String SoDT=listNV.get(i).getSoDT();
-            String ChucDanh=listNV.get(i).getChucDanh();
-            int MaPhong=Integer.parseInt(listNV.get(i).getMaPhong());
-            long Luong=listNV.get(i).getLuong();
             connect();
-            //update dtb
-            String update="update SYS.QLPK_NHANVIEN set HOTEN=?, NGAYSINH=?, GIOITINH=?, DIACHI=?,"
-                    + "SDT=?, PHANQUYEN=?, CHUCDANH=?, MAPHONG=?,"
-                    + "LUONG=? WHERE MANV="+MaNV;
-            PreparedStatement pre=conn.prepareStatement(update);
-            int phanQuyen=1;
-            if(ChucDanh.equalsIgnoreCase("nhan vien"))
-                phanQuyen=1;
-            else if (ChucDanh.equalsIgnoreCase("quan ly"))
-                phanQuyen=2;
-            else{
-                JOptionPane.showMessageDialog(panelKhamBenh, "Nhập chức danh là nhan vien hoặc quan ly");
-                return 0;
+            
+            String sql = "SELECT MaHD FROM SYS.QLPK_HOADON WHERE MaBN=" + mabn;
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+            
+            String delete = "";
+            while(rs.next()) {
+                int maHD = rs.getInt(1);
+                
+                delete = "DELETE FROM SYS.QLPK_TOATHUOC WHERE MaHD=" + maHD;
+                Statement stm1 = conn.createStatement();
+                stm1.executeUpdate(delete);
+                
+                delete = "DELETE FROM SYS.QLPK_HOADON WHERE MaHD=" + maHD;
+                Statement stm2 = conn.createStatement();
+                stm2.executeUpdate(delete);
             }
             
-            //Nhập dữ liệu vô csdl
-            
-            pre.setString(1, TenNV);
-            pre.setDate(2, sqlDate);
-            pre.setString(3, GioiTinh);
-            pre.setString(4, DiaChi);
-            pre.setString(5, SoDT);
-            pre.setInt(6, phanQuyen);
-            pre.setString(7, ChucDanh);
-            pre.setInt(8, MaPhong);
-            pre.setLong(9, Luong);
-            //pre.setInt(12, MaNV);
-            int x=pre.executeUpdate();
-            JOptionPane.showMessageDialog(panelKhamBenh, x+" dòng đã được cập nhật");
+            delete = "DELETE FROM SYS.QLPK_BENHNHAN WHERE MABN=" + mabn;
+            Statement stm3 = conn.createStatement();
+            int x = stm3.executeUpdate(delete);
+
             conn.close();
-            //update Jtable
-            updateNhanVienJtable(location);
-            location=-1;
-            return 1;
+            return x;
+        } 
+        catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Lỗi kết nối csdl");
+            return 0;
+        }  
+    }
+    
+    public int deleteThuoc(int maThuoc){
+        try {
+            //tblModelThuoc.removeRow(location);
+            //listThuoc.remove(location);
+            //location=-1;
+            connect();
+            String sql = "UPDATE SYS.QLPK_THUOC SET XOA=1 WHERE MATHUOC=" +maThuoc;
+            Statement stm = conn.createStatement();
+            int x = stm.executeUpdate(sql);
+            
+//            String delete = "delete from SYS.QLPK_THUOC where MATHUOC="+maThuoc;
+//            Statement stm=conn.createStatement();
+//            int x=stm.executeUpdate(delete);
+            
+            String select="SELECT * FROM SYS.QLPK_THUOC WHERE XOA=0";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery(select);
+            
+            tblModelThuoc.setRowCount(0);
+            while(rs.next()) {
+                Object[] objs ={rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5)};
+                tblModelThuoc.addRow(objs);
+            }
+            
+            conn.close();
+            return x;
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
+            JOptionPane.showMessageDialog(this, "Lỗi kết nối csdl");
             return 0;
-        } catch (ParseException ex){
-            //Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi convert dữ liệu Ngày sinh");
-            return 0;
-        }
+        }  
     }
     
     public int getMaHD(){
@@ -502,14 +509,12 @@ public class BaseFrame extends javax.swing.JFrame {
             
             conn.close();
             return x;
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
             return 0;
-        }  //catch (IndexOutOfBoundsException e){
-//            JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi out of bound index");
-//            return 0;
-//        }
+        }
     }
        
     public void updateBenhNhanJtable(int loca){
@@ -529,11 +534,19 @@ public class BaseFrame extends javax.swing.JFrame {
     }
     
     public void show_BenhNhan(){
+        int n = tblBenhNhan.getRowCount();
         tblModelBN =(DefaultTableModel)tblBenhNhan.getModel();
-        int j = 1;
-        for(int i=0; i<listBN.size(); i++){
-            Object[] row={listBN.get(i).getMaBN(), listBN.get(i).getHoTen(), listBN.get(i).getNgaySinh(), 
-                         listBN.get(i).getGioiTinh(), listBN.get(i).getDiaChi(), listBN.get(i).getSDT()};
+        if(n > 0) tblModelBN.setRowCount(0);
+  
+        for(int i=0; i < listBN.size(); i++){
+            Object[] row = {
+                listBN.get(i).getMaBN(),
+                listBN.get(i).getHoTen(),
+                listBN.get(i).getNgaySinh(), 
+                listBN.get(i).getGioiTinh(),
+                listBN.get(i).getDiaChi(),
+                listBN.get(i).getSDT()
+            };
             tblModelBN.addRow(row);
         }
     }
@@ -541,52 +554,52 @@ public class BaseFrame extends javax.swing.JFrame {
     public int updateBenhNhan(){
         try {
             //Gán thông tin cho biến
-            int i=location;
-            int MaBN=listBN.get(i).getMaBN();
-            String TenBN=listBN.get(i).getHoTen();
+            int i = location;
+            int MaBN        = listBN.get(i).getMaBN();
+            String TenBN    = listBN.get(i).getHoTen();
+            String DiaChi   = listBN.get(i).getDiaChi();
+            String GioiTinh = listBN.get(i).getGioiTinh();
+            String SoDT     = listBN.get(i).getSDT();
             
-            String date=listBN.get(i).getNgaySinh();
-            java.util.Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(date);
+            String date = listBN.get(i).getNgaySinh();
+            java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             java.sql.Date sqlDate = new java.sql.Date(date2.getTime());
             
-            String DiaChi=listBN.get(i).getDiaChi();
-            String GioiTinh=listBN.get(i).getGioiTinh();
-            
-            String SoDT=listBN.get(i).getSDT();
             connect();
-            //update dtb
             String update="update SYS.QLPK_BENHNHAN set HOTEN=?, NGAYSINH=?, GIOITINH=?, DIACHI=?,"
                     + "SDT=? WHERE MABN="+MaBN;
-            PreparedStatement pre=conn.prepareStatement(update);
-            
-            //Nhập dữ liệu vô csdl
+            PreparedStatement pre = conn.prepareStatement(update);
             
             pre.setString(1, TenBN);
             pre.setDate(2, sqlDate);
             pre.setString(3, GioiTinh);
             pre.setString(4, DiaChi);
             pre.setString(5, SoDT);
-            int x=pre.executeUpdate();
-            JOptionPane.showMessageDialog(this, x+" dòng đã được cập nhật");
+            int x = pre.executeUpdate();
+            JOptionPane.showMessageDialog(this, x + " dòng đã được cập nhật");
             conn.close();
-            //update Jtable
+            
+            // Update Jtable
             updateBenhNhanJtable(location);
             updateBnTiepNhanJtable(location);
-            location=-1;
+            
+            location = -1;
             return 1;
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
             return 0;
-        } catch (ParseException ex){
+        } 
+        catch (ParseException ex){
             //Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi convert dữ liệu Ngày sinh");
             return 0;
         }
     }
     
-//--------------------------------------------------------------------------Tiếp nhận-----------------------------------------
-    //private Connection conn;
+    //--------------------------------------------------------------------------Tiếp nhận-----------------------------------------
+    // Private Connection conn;
     private int maBN;
     private DefaultTableModel tblModel;
     ArrayList<BenhNhan> listBN = getBenhNhanList(); 
@@ -602,7 +615,7 @@ public class BaseFrame extends javax.swing.JFrame {
             while(rs.next()){          
                 Date ngaySinh = rs.getDate("NGAYSINH");
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");  
-                String NgaySinh = dateFormat.format(ngaySinh); 
+                String NgaySinh = dateFormat.format(ngaySinh);
                 bn = new BenhNhan(rs.getInt("MABN"),rs.getString("HOTEN"),NgaySinh,rs.getString("GIOITINH"),rs.getString("DIACHI"),rs.getString("SDT"));
                 BenhNhansList.add(bn);
             }
@@ -612,54 +625,41 @@ public class BaseFrame extends javax.swing.JFrame {
         }
         return BenhNhansList;
     }
-   
-    
-    public void addBenhNhan(BenhNhan s){
-        listBN.add(s);
-        tblModel = (DefaultTableModel)tblBN.getModel();
-        tblModel.setRowCount(0);
-        tblModelBN.setRowCount(0);
-        int i = 1;
-        for(BenhNhan bn: listBN){
-            tblModel.addRow(new Object[]{i,bn.getMaBN(),bn.getHoTen(),bn.getNgaySinh(),bn.getGioiTinh(),bn.getDiaChi(),bn.getSDT()});
-            tblModelBN.addRow(new Object[]{bn.getMaBN(),bn.getHoTen(),bn.getNgaySinh(),bn.getGioiTinh(),bn.getDiaChi(),bn.getSDT()});
-            i++;
-        }
-    }
-    
-    public void setMaBN(){
-        try {
-            int maBN=0;
-            connect();
-            String query = "SELECT GET_MABN FROM DUAL";
-            Statement stm=conn.createStatement();
-            ResultSet rs=stm.executeQuery(query);
-            while(rs.next()){
-                maBN=rs.getInt(1);
-            }
-            txtMaBN.setText(maBN+"");
-            conn.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     
     public int getMaBN(){
         return maBN;
     }
    
     public void show_BN(){
-        //ArrayList<BenhNhan> list = getBenhNhanList();
-        tblModel =(DefaultTableModel)tblBN.getModel();
-        int j = 1;
-        for(int i=0; i<listBN.size(); i++){
-            Object[] row={j, listBN.get(i).getMaBN(), listBN.get(i).getHoTen(), listBN.get(i).getNgaySinh(), 
-                         listBN.get(i).getGioiTinh(), listBN.get(i).getDiaChi(), listBN.get(i).getSDT()};
-            tblModel.addRow(row);
-            j++;
+        try {
+            tblModel =(DefaultTableModel)tblBN.getModel();
+            tblModel.setRowCount(0);
+            connect();
+            String query = "SELECT * FROM SYS.QLPK_BENHNHAN";
+            Statement stm=conn.createStatement();
+            ResultSet rs=stm.executeQuery(query);
+            int i = 1;
+            while(rs.next()){
+                Date ngaySinh = rs.getDate("NGAYSINH");
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");  
+                String NgaySinh = dateFormat.format(ngaySinh); 
+                tblModel.addRow(new Object[]{
+                    i,
+                    rs.getInt("MaBN"),
+                    rs.getString("HOTEN"), 
+                    NgaySinh,
+                    rs.getString("GIOITINH"),
+                    rs.getString("DIACHI"),
+                    rs.getString("SDT")                    
+                });
+                i++;
+            }
+            
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        setMaBN();
-//        txtMaBN.setEditable(false);
+        
         updateCBBchuanDoan();
         updateCBBbacSi();
     }
@@ -682,7 +682,7 @@ public class BaseFrame extends javax.swing.JFrame {
     public void updateCBBbacSi(){
         try{
             connect();
-            String query2 = "SELECT * FROM SYS.QLPK_NHANVIEN";
+            String query2 = "SELECT * FROM SYS.QLPK_NHANVIEN WHERE MaPhong=1"; // Phong kham
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             while(rs.next()){          
@@ -699,7 +699,7 @@ public class BaseFrame extends javax.swing.JFrame {
         ArrayList<Thuoc> ThuocsList = new ArrayList<>();
         try{
             connect();
-            String query2 = "SELECT * FROM SYS.QLPK_THUOC";
+            String query2 = "SELECT * FROM SYS.QLPK_THUOC WHERE XOA=0";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
             Thuoc thuoc;
@@ -770,7 +770,7 @@ public class BaseFrame extends javax.swing.JFrame {
             int x = pre.executeUpdate();
             JOptionPane.showMessageDialog(this, x+" dòng đã được thêm vào csdl");
             
-            String select="SELECT * FROM SYS.QLPK_THUOC";
+            String select="SELECT * FROM SYS.QLPK_THUOC WHERE XOA=0";
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery(select);
             
@@ -815,7 +815,7 @@ public class BaseFrame extends javax.swing.JFrame {
             String NoiSX=listThuoc.get(i).getNoiSX();
             connect();
             //update dtb
-            String update="update SYS.QLPK_THUOC set LOAITHUOC=?, DONVI=?, DONGIA=?, NOISX=?  WHERE MATHUOC="+MaThuoc;
+            String update="update SYS.QLPK_THUOC set LOAITHUOC=?, DONVI=?, DONGIA=?, NOISX=? WHERE MATHUOC="+MaThuoc;
             PreparedStatement pre=conn.prepareStatement(update);
             //Nhập dữ liệu vô csdl
             pre.setString(1, TenThuoc);
@@ -840,11 +840,15 @@ public class BaseFrame extends javax.swing.JFrame {
     private DefaultTableModel tblModelToaThuoc;
     
     public void updateCBBloaiThuoc(){
+        for(int i = cbbLoaiThuoc.getItemCount() - 1; i >= 0; i--){
+            cbbLoaiThuoc.removeItemAt(i);
+        }
         try{
             connect();
-            String query2 = "SELECT LOAITHUOC FROM SYS.QLPK_THUOC";
+            String query2 = "SELECT LOAITHUOC FROM SYS.QLPK_THUOC WHERE XOA=0";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
+            
             while(rs.next()){          
                 cbbLoaiThuoc.addItem(rs.getString(1));
             }
@@ -855,47 +859,48 @@ public class BaseFrame extends javax.swing.JFrame {
     }
     
     public void updateCBBTienSu(){
-        for(int i=cbbTienSu.getItemCount()-1;i>=0;i--){
+        for(int i = cbbTienSu.getItemCount() - 1; i >= 0; i--){
             cbbTienSu.removeItemAt(i);
         }
         try{
             connect();
-            String query2 = "SELECT DISTINCT CHUANDOAN FROM SYS.QLPK_HOADON WHERE MABN="+txtMaBNKham.getText();
+            String query2 = "SELECT DISTINCT CHUANDOAN FROM SYS.QLPK_HOADON WHERE MABN=" + txtMaBNKham.getText();
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query2);
+            
             while(rs.next()){          
                 cbbTienSu.addItem(rs.getString(1));
             }
+            
             conn.close();
-        }catch(SQLException e){
+        } catch(SQLException e){
             e.printStackTrace();
         }
     }
     
     public void inputThuocToToa(){
         try{
-        
-        int maHD=Integer.parseInt(txtMaHD.getText());
-        int maThuoc=1;
-        String loaiThuoc=cbbLoaiThuoc.getSelectedItem().toString();
-        int soLuong=(Integer)this.soLuong.getValue();
-        String cachDung=txtCachDung.getText();
-        if(cachDung.equals("")==true){
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập cách dùng");
+            int maHD = Integer.parseInt(txtMaHD.getText());
+            int maThuoc = 1;
+            String loaiThuoc = cbbLoaiThuoc.getSelectedItem().toString();
+            int soLuong=(Integer)this.soLuong.getValue();
+            String cachDung=txtCachDung.getText();
+            if(cachDung.equals("")==true){
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập cách dùng");
         }
         else{
             try{
                 connect();
-                String getMaThuoc="select MATHUOC FROM SYS.QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
+                String getMaThuoc="select distinct MATHUOC FROM SYS.QLPK_THUOC WHERE XOA=0 AND LOAITHUOC='"+loaiThuoc+"'";
                 Statement stm=conn.createStatement();
                 ResultSet rs=stm.executeQuery(getMaThuoc);
+                
                 while(rs.next()){
                     maThuoc=rs.getInt(1);
                 }
                 
-                String insert="insert into SYS.QLPK_TOATHUOC values(?,?,?,?,?,?)";
+                String insert="insert into SYS.QLPK_TOATHUOC (MAHD,MATHUOC,SOLUONG,THANHTIEN,CACHDUNG,TINHTRANG) values(?,?,?,?,?,?)";
                 PreparedStatement pre=conn.prepareStatement(insert);
-                
                 //Nhập dữ liệu vô csdl
                 pre.setInt(1, maHD);
                 pre.setInt(2, maThuoc);
@@ -928,7 +933,7 @@ public class BaseFrame extends javax.swing.JFrame {
         updateCBBloaiThuoc();
         txtDonVi.setEditable(false);
         txtMaHD.setEditable(false);
-        tblModelToaThuoc=(DefaultTableModel)tblToaThuoc.getModel();
+        tblModelToaThuoc = (DefaultTableModel)tblToaThuoc.getModel();
     }
     
 //------------------------------------------------------------------------Thống kê-----------------------------------------------------------------------------------
@@ -1061,24 +1066,6 @@ public class BaseFrame extends javax.swing.JFrame {
         
         
     }
-    //hàm khởi tạo mặc định
-    public BaseFrame() {
-        initComponents();
-        //chèn hình
-        editImageFrame();
-        setTitle("Quản lí phòng mạch tư");
-        show_nhanVien();
-        panelNhanVien.setVisible(false);
-        show_BenhNhan();
-        show_BN();
-        show_Thuoc();
-        show_KhamBenh();
-        showThongKe();
-        panelThongKe.setVisible(false);
-        this.setSize(1006, 520);
-        //setVisible(true);
-        setColor(pnBttTiepNhan);
-    }
    
     /**
      * This method is called from within the constructor to initialize the form.
@@ -1120,13 +1107,11 @@ public class BaseFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblBN = new javax.swing.JTable();
         jLabel14 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        txtMaBN = new javax.swing.JTextField();
         txtTenBN = new javax.swing.JTextField();
         txtDiaChi = new javax.swing.JTextField();
         txtSDT = new javax.swing.JTextField();
@@ -1269,7 +1254,6 @@ public class BaseFrame extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1006, 520));
 
         jPanel_title.setBackground(new java.awt.Color(69, 123, 179));
         jPanel_title.setPreferredSize(new java.awt.Dimension(1001, 65));
@@ -1538,9 +1522,6 @@ public class BaseFrame extends javax.swing.JFrame {
         jLabel14.setFont(new java.awt.Font("Tahoma", 1, 22)); // NOI18N
         jLabel14.setText("THÊM BỆNH NHÂN");
 
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel15.setText("Mã bệnh nhân");
-
         jLabel16.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel16.setText("Tên bệnh nhân");
 
@@ -1556,14 +1537,14 @@ public class BaseFrame extends javax.swing.JFrame {
         jLabel20.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel20.setText("SĐT");
 
-        jMale.setText("MALE");
+        jMale.setText("Nam");
         jMale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMaleActionPerformed(evt);
             }
         });
 
-        jFemale.setText("FEMALE");
+        jFemale.setText("Nữ");
         jFemale.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFemaleActionPerformed(evt);
@@ -1602,7 +1583,6 @@ public class BaseFrame extends javax.swing.JFrame {
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 684, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(38, 38, 38)
                         .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel20)
                             .addGroup(panelTiepNhanLayout.createSequentialGroup()
                                 .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel19)
@@ -1611,22 +1591,20 @@ public class BaseFrame extends javax.swing.JFrame {
                                 .addComponent(jMale)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jFemale))
-                            .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(btThemBN)
+                            .addComponent(jLabel14)
+                            .addGroup(panelTiepNhanLayout.createSequentialGroup()
                                 .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel14)
-                                    .addGroup(panelTiepNhanLayout.createSequentialGroup()
-                                        .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel16)
-                                            .addComponent(jLabel17)
-                                            .addComponent(jLabel15))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(txtSDT, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                                            .addComponent(txtDiaChi)
-                                            .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtNgaySinh, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
-                                            .addComponent(txtTenBN)))))))
+                                    .addComponent(jLabel16)
+                                    .addComponent(jLabel17)
+                                    .addComponent(jLabel20))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtSDT, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btThemBN)
+                                    .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(txtDiaChi)
+                                        .addComponent(txtNgaySinh, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                                        .addComponent(txtTenBN))))))
                     .addGroup(panelTiepNhanLayout.createSequentialGroup()
                         .addComponent(jLabel11)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1634,23 +1612,19 @@ public class BaseFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1))
                     .addComponent(jLabel13))
-                .addGap(35, 56, Short.MAX_VALUE))
+                .addGap(35, 58, Short.MAX_VALUE))
         );
         panelTiepNhanLayout.setVerticalGroup(
             panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelTiepNhanLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11)
+                    .addComponent(txtTimMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1)
                     .addComponent(jLabel14))
-                .addGap(18, 18, 18)
-                .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel11)
-                        .addComponent(txtTimMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton1))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel15)
-                        .addComponent(txtMaBN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(15, 15, 15)
                 .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelTiepNhanLayout.createSequentialGroup()
@@ -1674,7 +1648,7 @@ public class BaseFrame extends javax.swing.JFrame {
                         .addGroup(panelTiepNhanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel20)
                             .addComponent(txtSDT, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btThemBN))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
@@ -2648,6 +2622,8 @@ public class BaseFrame extends javax.swing.JFrame {
         panelNhanVien.setVisible(false);
         panelKhamBenh.setVisible(false);
         panelTiepNhan.setVisible(true);
+        show_BenhNhan();
+        
         panelThuoc.setVisible(false);
         panelThongKe.setVisible(false);
         
@@ -2657,6 +2633,8 @@ public class BaseFrame extends javax.swing.JFrame {
         setColor(pnBttTiepNhan);
         resetColor(pnBttThuoc);
         resetColor(pnBttThongKe);
+        
+        
         
     }//GEN-LAST:event_jButtonTiepNhanActionPerformed
 
@@ -2714,21 +2692,23 @@ public class BaseFrame extends javax.swing.JFrame {
 
     private void updateNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateNVActionPerformed
         // TODO add your handling code here:
-        int row=tblNhanVien.getSelectedRow();
-        location=row;
-        showNhanVienDialog show=new showNhanVienDialog(this, rootPaneCheckingEnabled);
+        int row = tblNhanVien.getSelectedRow();
+        location = row;
+        showNhanVienDialog show = new showNhanVienDialog(this, rootPaneCheckingEnabled);
         show.setVisible(rootPaneCheckingEnabled);
     }//GEN-LAST:event_updateNVActionPerformed
 
     private void btThemBNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btThemBNActionPerformed
         boolean flag = true;
-
-        if(txtTenBN.getText().equals("")||txtNgaySinh.getDate().equals("")|| txtDiaChi.getText().equals("")||txtSDT.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "Bạn hãy điền đầy đủ thông tin");
+        if(txtTenBN.getText().equals("") || txtNgaySinh.getDate().equals("") || txtDiaChi.getText().equals("") || txtSDT.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin");
         }
         else{
             try{
-                String tenBN = txtTenBN.getText();
+                String tenBN    = txtTenBN.getText();
+                String diaChi   = txtDiaChi.getText();
+                String soDT     = txtSDT.getText();
+                
                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                 String ngaySinh = dateFormat.format(txtNgaySinh.getDate());
                 java.util.Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(ngaySinh);
@@ -2736,20 +2716,13 @@ public class BaseFrame extends javax.swing.JFrame {
 
                 String gioiTinh = "";
                 if(jMale.isSelected()){
-                    gioiTinh += "MALE";
+                    gioiTinh += "Nam";
                 }
                 if(jFemale.isSelected()){
-                    gioiTinh += "FEMALE";
+                    gioiTinh += "Nữ";
                 }
 
-                String diaChi = txtDiaChi.getText();
-                String soDT = txtSDT.getText();
-
                 if(flag == true){
-                    BenhNhan bn = new BenhNhan(maBN,tenBN,ngaySinh,gioiTinh,diaChi,soDT);
-                    addBenhNhan(bn);
-                    JOptionPane.showMessageDialog(this, "Thêm thành công");
-
                     java.util.Date today = new java.util.Date();
                     txtTenBN.setText("");
                     txtNgaySinh.setDate(today);
@@ -2758,33 +2731,44 @@ public class BaseFrame extends javax.swing.JFrame {
                     
                     connect();
                     try {
-                        String insert = "insert into SYS.QLPK_BENHNHAN values(?,?,?,?,?)";
+                        String insert = "insert into SYS.QLPK_BENHNHAN(HOTEN,NGAYSINH,GIOITINH,SDT,DIACHI) values(?,?,?,?,?)";
                         PreparedStatement st = conn.prepareStatement(insert);
                         st.setString(1, tenBN);
                         st.setDate(2, sqlDate);
                         st.setString(3, gioiTinh);
-                        st.setString(4, diaChi);
-                        st.setString(5, soDT);
-                        int a = st.executeUpdate();
-
-//                        setMaBN();
-                        this.maBN=maBN;
-                        InserpkJdialog show=new InserpkJdialog(this, true);
-                        show.setVisible(true);
-                    } catch (SQLException ex) {
+                        st.setString(4, soDT);
+                        st.setString(5, diaChi);
+                        int n = st.executeUpdate();
+                        
+                        if(n > 0) {
+                            JOptionPane.showMessageDialog(this, "Thêm thành công");
+                             
+                            String getmabn = "select MAX(MABN) from SYS.QLPK_BENHNHAN";
+                            Statement stm = conn.createStatement();
+                            ResultSet rs = stm.executeQuery(getmabn);
+                            while(rs.next()){
+                                this.maBN = rs.getInt(1);
+                            }
+                            
+                            this.listBN = getBenhNhanList();
+                            show_BN();
+                            
+                            InserpkJdialog show = new InserpkJdialog(this, true);
+                            show.setVisible(true);
+                        }
+                        else JOptionPane.showMessageDialog(this, "Thêm thất bại");
+                    } 
+                    catch (SQLException ex) {
                         Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
                         JOptionPane.showMessageDialog(this, "Lỗi csdl");
                     }
-                }
-                //String url = "jdbc:oracle:thin:@localhost:1521:orcl";
-                
-            }catch (ParseException ex){
+                } 
+            }
+            catch (ParseException ex){
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Lỗi convert dữ liệu Ngày sinh");
             }
-
         }
-
     }//GEN-LAST:event_btThemBNActionPerformed
 
     private void tblBenhNhanMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBenhNhanMouseReleased
@@ -2870,87 +2854,79 @@ public class BaseFrame extends javax.swing.JFrame {
 
     private void btThemBenhAnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btThemBenhAnActionPerformed
         try {                                             
-            // TODO add your handling code here:
             try{
                 if(txtTrieuChung.getText().equals("")){
-                    JOptionPane.showMessageDialog(panelKhamBenh, "Không được để trống vùng dữ liệu");
+                    JOptionPane.showMessageDialog(panelKhamBenh, "Vui lòng điền đầy đủ thông tin");
                 }
-            }catch(Exception e){
+            }
+            catch(Exception e){
                 System.out.println("Không được để trống vùng dữ liệu");
             }
-            String trieuChung=txtTrieuChung.getText();
-            String chuanDoan=cbbChuanDoan.getSelectedItem().toString();
-            String bacSiKham=cbbBacSi.getSelectedItem().toString();
-            int mahd=Integer.parseInt(txtMaHD.getText());
+            
+            String trieuChung   = txtTrieuChung.getText();
+            String chuanDoan    = cbbChuanDoan.getSelectedItem().toString();
+            String bacSiKham    = cbbBacSi.getSelectedItem().toString();
+            int mahd            = Integer.parseInt(txtMaHD.getText());
+            
             connect();
-            int manv=0;
-            String getMaNV="select MANV FROM SYS.QLPK_NHANVIEN WHERE HOTEN='"+bacSiKham+"'";
-            Statement st=conn.createStatement();
-            ResultSet rs=st.executeQuery(getMaNV);
+            int manv = 0;
+            String getMaNV = "select MANV FROM SYS.QLPK_NHANVIEN WHERE HOTEN='"+bacSiKham+"'";
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(getMaNV);
             while(rs.next()){
-                manv=rs.getInt(1);
+                manv = rs.getInt(1);
             }
             conn.close();
             
             connect();
-            String query="UPDATE SYS.QLPK_HOADON SET MANV=?, TRIEUCHUNG=?, CHUANDOAN=?  WHERE MAHD="+mahd;
+            String query = "UPDATE SYS.QLPK_HOADON SET MANV=?, TRIEUCHUNG=?, CHUANDOAN=?  WHERE MAHD="+mahd;
             PreparedStatement pre=conn.prepareStatement(query);
             pre.setInt(1, manv);
             pre.setString(2, trieuChung);
             pre.setString(3, chuanDoan);
             
-            int a=pre.executeUpdate();
+            int a = pre.executeUpdate();
             JOptionPane.showMessageDialog(panelKhamBenh, "Thêm "+a+" bệnh án thành công");
             
-            String diaChi="";
-            String gioiTinh="";
-            String query1="select GIOITINH, DIACHI FROM SYS.QLPK_BENHNHAN WHERE MABN="+txtMaBNKham.getText();
-            Statement stm=conn.createStatement();
-            ResultSet rss=stm.executeQuery(query1);
+            String diaChi = "";
+            String gioiTinh = "";
+            String query1 = "select GIOITINH, DIACHI FROM SYS.QLPK_BENHNHAN WHERE MABN="+txtMaBNKham.getText();
+            Statement stm = conn.createStatement();
+            ResultSet rss = stm.executeQuery(query1);
             while(rss.next()){
-                gioiTinh=rss.getString(1);
-                diaChi=rss.getString(2);
+                gioiTinh = rss.getString(1);
+                diaChi = rss.getString(2);
             }
             
             
-        try {    
-            Map<String, Object> parameters = new HashMap<String, Object>();
-            JasperDesign jasperDesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\report1.jrxml");
-            parameters.put("maBN", txtMaBNKham.getText().toString());
-            parameters.put("maHD", txtMaHD.getText().toString());
-            parameters.put("hoTen", txtHoTen.getText().toString());
-            parameters.put("gioiTinh", gioiTinh);
-            parameters.put("diaChi", diaChi);
-            parameters.put("chuanDoan", cbbChuanDoan.getSelectedItem().toString());
-            parameters.put("bacSi", cbbBacSi.getSelectedItem().toString());
-            
-            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            
-            //JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport , parameters, conn);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport , parameters, conn);
-            
-            JasperViewer.viewReport(jasperPrint);
-            conn.close();
-            refreshKhamBenh();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi tạo hóa đơn");
-            e.printStackTrace();
-        }
-        } catch (SQLException ex) {
+            try {    
+                Map<String, Object> parameters = new HashMap<String, Object>();
+                JasperDesign jasperDesign = JRXmlLoader.load("C:\\Users\\T470\\Documents\\Java\\DoAn\\Java_IS216.M21_21\\src\\report\\report1.jrxml");
+                parameters.put("maBN", txtMaBNKham.getText().toString());
+                parameters.put("maHD", txtMaHD.getText().toString());
+                parameters.put("hoTen", txtHoTen.getText().toString());
+                parameters.put("gioiTinh", gioiTinh);
+                parameters.put("diaChi", diaChi);
+                parameters.put("chuanDoan", cbbChuanDoan.getSelectedItem().toString());
+                parameters.put("bacSi", cbbBacSi.getSelectedItem().toString());
+
+                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport , parameters, conn);
+
+                JasperViewer.viewReport(jasperPrint);
+                conn.close();
+                refreshKhamBenh();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi tạo hóa đơn");
+                e.printStackTrace();
+            }
+        } 
+        catch (SQLException ex) {
             JOptionPane.showMessageDialog(panelKhamBenh, "lỗi truy vấn csdl");
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null,ex);
         }
-        
     }//GEN-LAST:event_btThemBenhAnActionPerformed
-
-    private void tblBNMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBNMouseReleased
-        // TODO add your handling code here:
-//        if(evt.getButton()==MouseEvent.BUTTON3){
-//            if(evt.isPopupTrigger()&&tblBN.getSelectedRowCount()!=0){
-//                PopUpMenu.show(evt.getComponent(), evt.getX(), evt.getY());
-//            }
-//        }
-    }//GEN-LAST:event_tblBNMouseReleased
 
     private void txtTimMaThuocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTimMaThuocActionPerformed
         DefaultTableModel table= (DefaultTableModel)tblThuoc.getModel();
@@ -2970,15 +2946,15 @@ public class BaseFrame extends javax.swing.JFrame {
     private void btTimPKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTimPKActionPerformed
         try {
             connect();
-            String query="SELECT H.MABN, B.HOTEN, H.LIDOKHAM FROM SYS.QLPK_HOADON H, SYS.QLPK_BENHNHAN B WHERE H.MABN=B.MABN AND H.MAHD="+txtTimMaPK.getText();
-            Statement stm=conn.createStatement();
-            ResultSet rs=stm.executeQuery(query);
+            String query = "SELECT H.MABN, B.HOTEN, H.LIDOKHAM FROM SYS.QLPK_HOADON H, SYS.QLPK_BENHNHAN B WHERE H.MABN=B.MABN AND H.MAHD="+txtTimMaPK.getText();
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery(query);
             if(!rs.isBeforeFirst()){
                 JOptionPane.showMessageDialog(panelKhamBenh, "Không tồn tại mã phiếu khám");
             }
             else{
                 while(rs.next()){
-                    String maBN=String.valueOf(rs.getInt(1));
+                    String maBN = String.valueOf(rs.getInt(1));
                     txtMaBNKham.setText(maBN);
                     txtHoTen.setText(rs.getString(2));
                     txtLiDoKham.setText(rs.getString(3));
@@ -3014,7 +2990,7 @@ public class BaseFrame extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         try {
             int maThuoc = Integer.parseInt(txtTimMaThuoc.getText());
-            String sql="SELECT MATHUOC FROM SYS.QLPK_THUOC WHERE MATHUOC="+maThuoc;
+            String sql="SELECT MATHUOC FROM SYS.QLPK_THUOC WHERE XOA=0 AND MATHUOC="+maThuoc;
             connect();
             Statement stm=conn.createStatement();
             ResultSet rs=stm.executeQuery(sql);
@@ -3073,7 +3049,7 @@ public class BaseFrame extends javax.swing.JFrame {
     private void btTimMaBNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btTimMaBNActionPerformed
         //boolean flag = true;
         try {
-                int maBN = Integer.parseInt(txtTimBenhNhan.getText());
+                String maBN = String.valueOf(txtTimBenhNhan.getText());
                 String sql="SELECT MABN FROM SYS.QLPK_BENHNHAN WHERE MABN="+maBN;
 
                 connect();
@@ -3109,7 +3085,7 @@ public class BaseFrame extends javax.swing.JFrame {
             if(flag == true){
                 int maBN = Integer.parseInt(txtTimMaBN.getText());
                 String sql="SELECT MABN FROM SYS.QLPK_BENHNHAN WHERE MABN="+maBN;
-
+                
                 connect();
                 Statement stm=conn.createStatement();
                 ResultSet rs=stm.executeQuery(sql);
@@ -3132,14 +3108,14 @@ public class BaseFrame extends javax.swing.JFrame {
                 }
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelKhamBenh, "Mã nhân viên là số");
+            JOptionPane.showMessageDialog(panelKhamBenh, "Mã bê?nh nhân là số");
             flag = false;
         }  
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void cbbLoaiThuocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbLoaiThuocActionPerformed
         try {
-            String loaiThuoc=cbbLoaiThuoc.getSelectedItem().toString();
+            String loaiThuoc = cbbLoaiThuoc.getSelectedItem().toString();
             connect();
             String donvi="";
             String getMaThuoc="select DONVI FROM SYS.QLPK_THUOC WHERE LOAITHUOC='"+loaiThuoc+"'";
@@ -3157,7 +3133,7 @@ public class BaseFrame extends javax.swing.JFrame {
 
     private void jButtonThongkeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonThongkeActionPerformed
         // TODO add your handling code here:
-        if(quanLy==1){
+        if(quanLy!=1){
             JOptionPane.showMessageDialog(panelKhamBenh, "Chỉ có quản lý mới được xem mục này");
         }
         else{
@@ -3251,7 +3227,7 @@ public class BaseFrame extends javax.swing.JFrame {
                 connect();
                 try {
                     Map<String, Object> parameters = new HashMap<String, Object>();
-                    JasperDesign jdesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\reportThongKe.jrxml");
+                    JasperDesign jdesign = JRXmlLoader.load("C:\\Users\\T470\\Documents\\Java\\DoAn\\Java_IS216.M21_21\\src\\report\\reportThongKe.jrxml");
                     //parameters.put("TongDoanhThu", rutGonDoanhThu(thanhtien)+" VNĐ");
                     parameters.put("Thang", cbbMonth.getSelectedItem().toString());
                     parameters.put("Nam", txtYear.getSelectedItem().toString());
@@ -3274,7 +3250,7 @@ public class BaseFrame extends javax.swing.JFrame {
             connect();
             try {
                 Map<String, Object> parameters = new HashMap<String, Object>();
-                JasperDesign jdesign = JRXmlLoader.load("D:\\Java\\JavaPhongMT\\src\\report\\newReport2.jrxml");
+                JasperDesign jdesign = JRXmlLoader.load("C:\\Users\\T470\\Documents\\Java\\DoAn\\Java_IS216.M21_21\\src\\report\\newReport2.jrxml");
                 //parameters.put("TongDoanhThu", rutGonDoanhThu(thanhtien)+" VNĐ");
                 parameters.put("Nam", txtYear.getSelectedItem().toString());
 
@@ -3299,6 +3275,15 @@ public class BaseFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         jMale.setSelected(false);
     }//GEN-LAST:event_jFemaleActionPerformed
+
+    private void tblBNMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBNMouseReleased
+        // TODO add your handling code here:
+        //        if(evt.getButton()==MouseEvent.BUTTON3){
+            //            if(evt.isPopupTrigger()&&tblBN.getSelectedRowCount()!=0){
+                //                PopUpMenu.show(evt.getComponent(), evt.getX(), evt.getY());
+                //            }
+            //        }
+    }//GEN-LAST:event_tblBNMouseReleased
 
     /**
      * @param args the command line arguments
@@ -3384,7 +3369,6 @@ public class BaseFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
@@ -3463,7 +3447,6 @@ public class BaseFrame extends javax.swing.JFrame {
     private javax.swing.JTextField txtDonVi;
     private javax.swing.JTextField txtHoTen;
     private javax.swing.JTextField txtLiDoKham;
-    private javax.swing.JTextField txtMaBN;
     private javax.swing.JTextField txtMaBNKham;
     private javax.swing.JTextField txtMaHD;
     private com.toedter.calendar.JDateChooser txtNgaySinh;

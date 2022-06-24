@@ -29,7 +29,7 @@
 	</style>
 	<subDataset name="New Dataset 1" uuid="6e90189a-c330-4dc3-b34b-e7b7fb5ff163">
 		<queryString language="SQL">
-			<![CDATA[select * from TOATHUOC tt join THUOC t on tt.MATHUOC=t.MATHUOC]]>
+			<![CDATA[select * from SYS.QLPK_TOATHUOC tt join SYS.QLPK_THUOC t on tt.MATHUOC=t.MATHUOC]]>
 		</queryString>
 		<field name="MAHD" class="java.math.BigDecimal"/>
 		<field name="LOAITHUOC" class="java.lang.String"/>
@@ -46,7 +46,7 @@
 	<parameter name="maHD" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT T.LOAITHUOC, TT.SOLUONG, TT.CACHDUNG
-FROM TOATHUOC TT, THUOC T
+FROM SYS.QLPK_TOATHUOC TT, SYS.QLPK_THUOC T
 WHERE TT.MATHUOC=T.MATHUOC AND TT.MAHD=$P{maHD}]]>
 	</queryString>
 	<field name="LOAITHUOC" class="java.lang.String"/>

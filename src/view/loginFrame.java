@@ -22,7 +22,7 @@ import model.User;
 import view.BaseFrame;
 /**
  *
- * @author HP
+ * @author Phuong Lan, Hoang Duc
  */
 public class loginFrame extends javax.swing.JFrame {
 
@@ -113,7 +113,7 @@ public class loginFrame extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(202, 240, 248));
-        jLabel5.setText("PHÒNG MẠCH TƯ ABC");
+        jLabel5.setText("PHÒNG MẠCH TƯ UIT");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
