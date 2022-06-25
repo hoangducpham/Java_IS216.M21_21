@@ -7,7 +7,7 @@
 	<parameter name="Nam" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[select MAHD, MANV, THANHTIEN, NGAYKHAM 
-from HOADON
+from SYS.QLPK_HOADON
 WHERE EXTRACT(YEAR FROM NGAYKHAM)=$P{Nam} AND EXTRACT(MONTH FROM NGAYKHAM)=$P{Thang}
 ORDER BY EXTRACT(DAY FROM NGAYKHAM)]]>
 	</queryString>

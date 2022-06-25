@@ -15,7 +15,7 @@ import model.BenhNhan;
 
 /**
  *
- * @author An Phan
+ * @author Phuong Lan, An Phan
  */
 public class showBenhNhanDialog extends javax.swing.JDialog {
     private String gioiTinh;

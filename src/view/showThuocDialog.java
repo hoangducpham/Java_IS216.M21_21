@@ -20,7 +20,7 @@ import model.Thuoc;
 
 /**
  *
- * @author Khaitruong_18520878
+ * @author Phuong Lan, Khaitruong_18520878
  */
 public class showThuocDialog extends javax.swing.JDialog {
     private String donVi;
@@ -29,15 +29,24 @@ public class showThuocDialog extends javax.swing.JDialog {
             txtMaThuoc.setText(nv.getMaThuoc()+"");
             txtTenThuoc.setText(nv.getLoaiThuoc());
             txtDonGia.setText(nv.getDonGia()+"");
-            if(nv.getDonVi().equalsIgnoreCase("vien")){
+            
+            if(nv.getDonVi().equalsIgnoreCase("Viên")){
                 vien.setSelected(true);
                 chai.setSelected(false);
-                donVi="Vien";
+                hop.setSelected(false);
+                donVi = "Viên";
             }
-            else{
-                vien.setSelected(false);
+            else if (nv.getDonVi().equalsIgnoreCase("Chai")) {
                 chai.setSelected(true);
-                donVi="Chai";
+                vien.setSelected(false);
+                hop.setSelected(false);
+                donVi = "Chai";
+            }
+            else {
+                hop.setSelected(true);
+                vien.setSelected(false);
+                chai.setSelected(false);
+                donVi = "Hộp";
             }
             
             txtNoiSX.setText(nv.getNoiSX());
@@ -107,6 +116,7 @@ public class showThuocDialog extends javax.swing.JDialog {
         chai = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        hop = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -190,6 +200,14 @@ public class showThuocDialog extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        hop.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        hop.setText("Hộp");
+        hop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                hopActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -213,6 +231,8 @@ public class showThuocDialog extends javax.swing.JDialog {
                                 .addComponent(vien)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chai)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(hop, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(txtMaThuoc)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -244,16 +264,18 @@ public class showThuocDialog extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vien)
-                    .addComponent(chai))
+                    .addComponent(chai)
+                    .addComponent(hop))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtNoiSX, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btXoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btCapNhat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btThoat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btXoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btThoat, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -275,15 +297,17 @@ public class showThuocDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         if(vien.isSelected()){
             chai.setSelected(false);
-            donVi = "Vien";
+            hop.setSelected(false);
+            donVi = "Viên";
         }
     }//GEN-LAST:event_vienActionPerformed
 
     private void chaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chaiActionPerformed
         // TODO add your handling code here:
         if(chai.isSelected()){
-            vien.setSelected(true);
-            donVi="Chai";
+            vien.setSelected(false);
+            hop.setSelected(false);
+            donVi = "Chai";
         }
     }//GEN-LAST:event_chaiActionPerformed
 
@@ -305,7 +329,7 @@ public class showThuocDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         if(updateThuoc(home.getlocation())==1){//update trong arraylist
             if(home.updateThuoc()==1){//update trong database
-                this.dispose();;
+                this.dispose();
             }
             else{
                 JOptionPane.showMessageDialog(rootPane, "Lỗi update trong baseframe");
@@ -315,6 +339,15 @@ public class showThuocDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(rootPane, "Không có vị trí");
         }
     }//GEN-LAST:event_btCapNhatActionPerformed
+
+    private void hopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hopActionPerformed
+        // TODO add your handling code here:
+        if(hop.isSelected()){
+            chai.setSelected(false);
+            vien.setSelected(false);
+            donVi = "Hộp";
+        }
+    }//GEN-LAST:event_hopActionPerformed
 
     /**
      * @param args the command line arguments
@@ -363,6 +396,7 @@ public class showThuocDialog extends javax.swing.JDialog {
     private javax.swing.JButton btThoat;
     private javax.swing.JButton btXoa;
     private javax.swing.JRadioButton chai;
+    private javax.swing.JRadioButton hop;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

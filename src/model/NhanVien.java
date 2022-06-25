@@ -7,8 +7,9 @@ package model;
 
 /**
  *
- * @author HP
+ * @author Hoang Duc
  */
+
 public class NhanVien {
     private int maNV;
     private String tenNV;

@@ -24,13 +24,13 @@ import java.sql.Statement;
 
 /**
  *
- * @author HP
+ * @author Phuong Lan, KhaiTruong_18520878
  */
 public class insertNhanVienJDialog extends javax.swing.JDialog {
 
     PlaceHolder p1, p2, p3, p4, p5;
     private String gioiTinh="Nam";
-    private String chucDanh="NHAN VIEN";
+    private String chucDanh="Nhan Vien";
 
     public int inputNhanVien(){
 //        int maNV=Integer.parseInt(txtMaNV.getText());
@@ -103,28 +103,10 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
                 maNV=rs.getInt(1);
             }
             conn.close();
-            // txtMaNV.setText(maNV+"");
-            
-//            int id=1;
-//            boolean flag;
-//            while(true){
-//                flag=false;
-//                for(NhanVien nv:list){
-//                    if(id==nv.getMaNV()){
-//                        flag=true;
-//                        break;
-//                    }
-//                }
-//                if(!flag) break;
-//                ++id;
-//            }
-//            txtMaNV.setText(id+"");
-            
-            
             
             p1=new PlaceHolder(txtTenNV, "Nguyễn Văn A");
-            p2=new PlaceHolder(txtDiaChi, "khu phố 6, phường Linh Trung, quận Thủ Đức");
-            p3=new PlaceHolder(txtSDT, "0781234567");
+            p2=new PlaceHolder(txtDiaChi, "Khu phố 6, phường Linh Trung, quận Thủ Đức");
+            p3=new PlaceHolder(txtSDT, "0903144655");
             p4=new PlaceHolder(txtMaPhong, "1");
             p5=new PlaceHolder(txtLuong, "1000000");
         } catch (SQLException ex) {
@@ -455,7 +437,7 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         if(rbtNhanVien.isSelected()){
             rbtQuanLy.setSelected(false);
-            chucDanh="NHAN VIEN";
+            chucDanh="Nhan Vien";
         }
     }//GEN-LAST:event_rbtNhanVienActionPerformed
 
@@ -463,7 +445,7 @@ public class insertNhanVienJDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         if(rbtQuanLy.isSelected()){
             rbtNhanVien.setSelected(false);
-            chucDanh="QUAN LY";
+            chucDanh="Quan Ly";
         }
     }//GEN-LAST:event_rbtQuanLyActionPerformed
 

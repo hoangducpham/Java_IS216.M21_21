@@ -31,6 +31,10 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
 
+/**
+ *
+ * @author Phuong Lan, An Phan
+ */
 public class InserpkJdialog extends javax.swing.JDialog {
     private BaseFrame home;
     private int maPK = 0;

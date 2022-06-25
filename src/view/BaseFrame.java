@@ -57,7 +57,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author An Phan
+ * @author Phuong Lan, Hoang Duc
  */
 public class BaseFrame extends javax.swing.JFrame {
     User us = new User();
@@ -236,7 +236,7 @@ public class BaseFrame extends javax.swing.JFrame {
             else if (ChucDanh.equalsIgnoreCase("quan ly"))
                 phanQuyen = 1;
             else{
-                JOptionPane.showMessageDialog(panelKhamBenh, "Nhập chức danh là nhan vien hoặc quan ly");
+                JOptionPane.showMessageDialog(panelKhamBenh, "Nhập chức danh là Nhan Vien hoặc Quan Ly");
                 return 0;
             }
             
@@ -244,7 +244,6 @@ public class BaseFrame extends javax.swing.JFrame {
             connect();
             String insert = "insert into SYS.QLPK_NHANVIEN(HOTEN,NGAYSINH,GIOITINH,SDT,DIACHI,CHUCDANH,PHANQUYEN,MAPHONG,LUONG) values(?,?,?,?,?,?,?,?,?)";
             PreparedStatement pre = conn.prepareStatement(insert);
-            
             pre.setString(1, TenNV);
             pre.setDate(2, sqlDate);
             pre.setString(3, GioiTinh);
@@ -666,6 +665,10 @@ public class BaseFrame extends javax.swing.JFrame {
     
     public void updateCBBchuanDoan(){
         try{
+            for(int i = cbbChuanDoan.getItemCount() - 1; i >= 0; i--){
+                cbbChuanDoan.removeItemAt(i);
+            }
+            
             connect();
             String query2 = "SELECT LOAIBENH FROM SYS.QLPK_LOAIBENH";
             Statement stm = conn.createStatement();
@@ -681,6 +684,10 @@ public class BaseFrame extends javax.swing.JFrame {
     
     public void updateCBBbacSi(){
         try{
+            for(int i = cbbBacSi.getItemCount() - 1; i >= 0; i--){
+                cbbBacSi.removeItemAt(i);
+            }
+            
             connect();
             String query2 = "SELECT * FROM SYS.QLPK_NHANVIEN WHERE MaPhong=1"; // Phong kham
             Statement stm = conn.createStatement();
@@ -745,28 +752,17 @@ public class BaseFrame extends javax.swing.JFrame {
         idThuocAuto=id;
     }
     
-    public int addThuoc(){
+    public int addThuoc(String tenThuoc, String donVi, int donGia, String noiSX){
         try {
-            int i=listThuoc.size()-1;
-            //int STT=listThuoc.size();
-            //int MaThuoc=listThuoc.get(i).getMaThuoc();
-            String TenThuoc=listThuoc.get(i).getLoaiThuoc();
-            String DonVi=listThuoc.get(i).getDonVi();
-            int DonGia=listThuoc.get(i).getDonGia();
-            String NoiSX=listThuoc.get(i).getNoiSX();
-            //Object[] objs={ STT, TenThuoc, DonVi, DonGia, NoiSX};
-            //thêm vô csdl
             connect();
             String insert="insert into SYS.QLPK_THUOC(LOAITHUOC,DONVI,DONGIA,NOISX) values(?,?,?,?)";
-            PreparedStatement pre=conn.prepareStatement(insert);
+            PreparedStatement pre = conn.prepareStatement(insert);
             
-           
-            //Nhập dữ liệu vô csdl
-            //pre.setInt(1, MaThuoc);
-            pre.setString(1, TenThuoc);
-            pre.setString(2, DonVi);
-            pre.setInt(3, DonGia);
-            pre.setString(4, NoiSX);
+            // Nhập dữ liệu vô csdl
+            pre.setString(1, tenThuoc);
+            pre.setString(2, donVi);
+            pre.setInt(3, donGia);
+            pre.setString(4, noiSX);
             int x = pre.executeUpdate();
             JOptionPane.showMessageDialog(this, x+" dòng đã được thêm vào csdl");
             
@@ -779,9 +775,6 @@ public class BaseFrame extends javax.swing.JFrame {
                 Object[] objs ={rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getString(5)};
                 tblModelThuoc.addRow(objs);
             }
-            
-            
-            
             
             conn.close();
             return 1;
@@ -840,10 +833,11 @@ public class BaseFrame extends javax.swing.JFrame {
     private DefaultTableModel tblModelToaThuoc;
     
     public void updateCBBloaiThuoc(){
-        for(int i = cbbLoaiThuoc.getItemCount() - 1; i >= 0; i--){
-            cbbLoaiThuoc.removeItemAt(i);
-        }
         try{
+            for(int i = cbbLoaiThuoc.getItemCount() - 1; i >= 0; i--){
+                cbbLoaiThuoc.removeItemAt(i);
+            }
+            
             connect();
             String query2 = "SELECT LOAITHUOC FROM SYS.QLPK_THUOC WHERE XOA=0";
             Statement stm = conn.createStatement();
@@ -859,10 +853,11 @@ public class BaseFrame extends javax.swing.JFrame {
     }
     
     public void updateCBBTienSu(){
-        for(int i = cbbTienSu.getItemCount() - 1; i >= 0; i--){
-            cbbTienSu.removeItemAt(i);
-        }
         try{
+            for(int i = cbbTienSu.getItemCount() - 1; i >= 0; i--){
+                cbbTienSu.removeItemAt(i);
+            }
+            
             connect();
             String query2 = "SELECT DISTINCT CHUANDOAN FROM SYS.QLPK_HOADON WHERE MABN=" + txtMaBNKham.getText();
             Statement stm = conn.createStatement();
@@ -880,45 +875,55 @@ public class BaseFrame extends javax.swing.JFrame {
     
     public void inputThuocToToa(){
         try{
-            int maHD = Integer.parseInt(txtMaHD.getText());
-            int maThuoc = 1;
-            String loaiThuoc = cbbLoaiThuoc.getSelectedItem().toString();
-            int soLuong=(Integer)this.soLuong.getValue();
-            String cachDung=txtCachDung.getText();
+            int maHD            = Integer.parseInt(txtMaHD.getText());
+            int maThuoc         = 1;
+            int donGia          = 0;
+            String loaiThuoc    = cbbLoaiThuoc.getSelectedItem().toString();
+            int soLuong         =(Integer)this.soLuong.getValue();
+            if (soLuong < 0) soLuong *= -1;
+                
+            String cachDung     = txtCachDung.getText();
             if(cachDung.equals("")==true){
                 JOptionPane.showMessageDialog(this, "Vui lòng nhập cách dùng");
-        }
-        else{
-            try{
-                connect();
-                String getMaThuoc="select distinct MATHUOC FROM SYS.QLPK_THUOC WHERE XOA=0 AND LOAITHUOC='"+loaiThuoc+"'";
-                Statement stm=conn.createStatement();
-                ResultSet rs=stm.executeQuery(getMaThuoc);
-                
-                while(rs.next()){
-                    maThuoc=rs.getInt(1);
-                }
-                
-                String insert="insert into SYS.QLPK_TOATHUOC (MAHD,MATHUOC,SOLUONG,THANHTIEN,CACHDUNG,TINHTRANG) values(?,?,?,?,?,?)";
-                PreparedStatement pre=conn.prepareStatement(insert);
-                //Nhập dữ liệu vô csdl
-                pre.setInt(1, maHD);
-                pre.setInt(2, maThuoc);
-                pre.setInt(3, soLuong);
-                pre.setInt(4, 0);
-                pre.setString(5, cachDung);
-                pre.setInt(6, 0);
-                int x=pre.executeUpdate();
+            }
+            else{
+                try{
+                    connect();
+                    String getMaThuoc="select distinct MATHUOC FROM SYS.QLPK_THUOC WHERE XOA=0 AND LOAITHUOC='"+loaiThuoc+"'";
+                    Statement stm = conn.createStatement();
+                    ResultSet rs = stm.executeQuery(getMaThuoc);
+                    while(rs.next()){
+                        maThuoc = rs.getInt(1);
+                    }
+                    
+                    String getDonGia = "SELECT DONGIA FROM SYS.QLPK_THUOC WHERE MATHUOC='"+maThuoc+"'";
+                    Statement stm2 = conn.createStatement();
+                    ResultSet rs2 = stm2.executeQuery(getDonGia);
+                    while(rs2.next()){
+                        donGia = rs2.getInt(1);
+                    }
 
-                Object[] objs={loaiThuoc, soLuong, cachDung};
-                tblModelToaThuoc.addRow(objs);
-                conn.close();
-            }catch (SQLException ex) {
-                Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
+                    String insert="insert into SYS.QLPK_TOATHUOC(MAHD,MATHUOC,SOLUONG,THANHTIEN,CACHDUNG,TINHTRANG) values(?,?,?,?,?,?)";
+                    PreparedStatement pre=conn.prepareStatement(insert);
+                    pre.setInt(1, maHD);
+                    pre.setInt(2, maThuoc);
+                    pre.setInt(3, soLuong);
+                    pre.setInt(4, donGia*soLuong);
+                    pre.setString(5, cachDung);
+                    pre.setInt(6, 0);
+                    int x = pre.executeUpdate();
+
+                    Object[] objs={loaiThuoc, soLuong, cachDung};
+                    tblModelToaThuoc.addRow(objs);
+                    conn.close();
+                }
+                catch (SQLException ex) {
+                    Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(panelKhamBenh, "Lỗi kết nối csdl");
+                }
             }
         }
-        } catch(Exception e){
+        catch(Exception e){
             e.printStackTrace();
             JOptionPane.showMessageDialog(panelKhamBenh, "Vui lòng tìm phiếu khám trước khi thêm hóa đơn");
         }
@@ -936,7 +941,7 @@ public class BaseFrame extends javax.swing.JFrame {
         tblModelToaThuoc = (DefaultTableModel)tblToaThuoc.getModel();
     }
     
-//------------------------------------------------------------------------Thống kê-----------------------------------------------------------------------------------
+    /*---------- THONG KE ----------*/
     DefaultTableModel tblModelHoaDon;
     DefaultTableModel tblModelDoanhSoThuoc;
     DefaultTableModel tblModelTimKiemHD;
@@ -1044,15 +1049,17 @@ public class BaseFrame extends javax.swing.JFrame {
         txtCachDung.setText("");
         tblModelToaThuoc.setRowCount(0);
     }
-//--------------------------------------------------------------------hàm khởi tạo mặc định------------------------------
-    //-------------------set color khi click button
+
+    
+    
+    // Set color khi click button
     public void setColor(JPanel panel){
         panel.setBackground(new Color(240, 240, 240));
     }
     public void resetColor(JPanel panel){
         panel.setBackground(new Color(204, 204, 255));
     }
-    //lấy hình từ folder src/images để chèn hình vào frame
+    // Lấy hình từ folder src/images để chèn hình vào frame
     public void editImageFrame(){
         ImageIcon myimage = new ImageIcon("src/images/da1.png");
         //Image img1 = myimage.getImage();
@@ -2646,6 +2653,9 @@ public class BaseFrame extends javax.swing.JFrame {
         panelTiepNhan.setVisible(false);
         panelThuoc.setVisible(false);
         panelThongKe.setVisible(false);
+        
+        // updateCBBloaiThuoc();
+        updateCBBbacSi();
         
         resetColor(pnBttBenhNhan);
         resetColor(pnBttNhanVien);

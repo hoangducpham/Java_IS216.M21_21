@@ -58,7 +58,7 @@ public class loginFrame extends javax.swing.JFrame {
             while(rs.next()){
                 int phanQuyen = rs.getInt(3);
                 
-                if (phanQuyen > 2) return 0;
+                if (rs.getString(1).equals("NULL") || rs.getString(2).equals("NULL")) return 0;
                 else {
                     String username = rs.getString(1);
                     String password = rs.getString(2);

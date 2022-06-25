@@ -13,12 +13,12 @@ import view.loginFrame;
 /**
  *
  * 
- * @author An Phan       
+ * @author Hoang Duc   
  * 
  */
 public class Run {
     public static void main(String[] args) {
-        loginFrame login=new loginFrame();
+        loginFrame login = new loginFrame();
         login.setVisible(true);
     }
 }

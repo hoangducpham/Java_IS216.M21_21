@@ -19,7 +19,7 @@ import model.Thuoc;
 
 /**
  *
- * @author KhaiTruong_18520878
+ * @author Phuong Lan, KhaiTruong_18520878
  */
 public class insertThuocJDialog extends javax.swing.JDialog {
     private BaseFrame home;
@@ -156,7 +156,12 @@ public class insertThuocJDialog extends javax.swing.JDialog {
         btThoat.setText("Hủy bỏ");
 
         cbbDonVi.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        cbbDonVi.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Viên ", "Chai" }));
+        cbbDonVi.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Viên", "Chai", "Hộp" }));
+        cbbDonVi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbbDonViActionPerformed(evt);
+            }
+        });
 
         jPanel2.setBackground(new java.awt.Color(69, 123, 179));
 
@@ -215,7 +220,6 @@ public class insertThuocJDialog extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -268,9 +272,23 @@ public class insertThuocJDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         int response=JOptionPane.showConfirmDialog(rootPane, "Bạn có chắc muốn thêm thuốc này không ?", "Xác nhận", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if(response==JOptionPane.YES_OPTION){
-            if(home.addThuoc()!=0) this.dispose();
+            String tenThuoc = txtTenThuoc.getText();
+            String donVi    = cbbDonVi.getSelectedItem().toString();
+            String noiSX    = txtNoiSX.getText();
+            int donGia      = Integer.parseInt(txtDonGia.getText());
+            
+            if(tenThuoc.equals("") == true || noiSX.equals("") == true){
+                JOptionPane.showMessageDialog(this, "Nhập thiếu giá trị");
+            }
+            else{
+                if(home.addThuoc(tenThuoc, donVi, donGia, noiSX)!=0) this.dispose();
+            }
         }
     }//GEN-LAST:event_btThemActionPerformed
+
+    private void cbbDonViActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbDonViActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbbDonViActionPerformed
 
     /**
      * @param args the command line arguments

@@ -23,7 +23,7 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 /**
  *
- * @author Admin
+ * @author Phuong Lan, Hoang Duc, Khai Truong
  */
 public class showToaThuocJDialog extends javax.swing.JDialog {
     private Connection conn;
@@ -31,7 +31,7 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
     public void connect(){
         try {
             String url="jdbc:oracle:thin:@localhost:1521:orcl";
-            conn=DriverManager.getConnection(url,"DOAN_ORACLE","admin");
+            conn=DriverManager.getConnection(url,"system","user_java123");
         } catch (SQLException ex) {
             Logger.getLogger(BaseFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -44,7 +44,7 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
         int tinhtrang=0;
         try {
             connect();
-            String query = "select T.LOAITHUOC, TT.SOLUONG, TT.TINHTRANG from THUOC T, TOATHUOC TT where T.MATHUOC=TT.MATHUOC AND MAHD=" + mahd;
+            String query = "select T.LOAITHUOC, TT.SOLUONG, TT.TINHTRANG from SYS.QLPK_THUOC T, SYS.QLPK_TOATHUOC TT where T.MATHUOC=TT.MATHUOC AND MAHD=" + mahd;
             java.sql.Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(query);
             while(rs.next()){
@@ -63,7 +63,7 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
             }
             
             int tienthuoc=0;
-            String query2="select SUM(THANHTIEN) FROM TOATHUOC WHERE MAHD="+mahd;
+            String query2="select SUM(THANHTIEN) FROM SYS.QLPK_TOATHUOC WHERE MAHD="+mahd;
             java.sql.Statement stm1 = conn.createStatement();
             ResultSet rs1 = stm1.executeQuery(query2);
             while(rs1.next()){
@@ -309,26 +309,61 @@ public class showToaThuocJDialog extends javax.swing.JDialog {
 
     private void btNhanThuocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNhanThuocActionPerformed
         try {
-            // TODO add your handling code here:
-            int mahd=home.getMaHoaDon();
+            int mahd        = home.getMaHoaDon();
+            long tienKham   = 20000;
+            long tienThuoc  = 0;
+            
+            // Sử dụng cho đồ án Java
             connect();
-            //Sử dụng cho đồ án Java 
-//            String query="update TOATHUOC SET TINHTRANG=? WHERE MAHD=?";
-//            PreparedStatement pre=conn.prepareStatement(query);
-//            pre.setInt(1, 1);
-//            pre.setInt(2, mahd);
-//            int x=pre.executeUpdate();
-//            JOptionPane.showMessageDialog(rootPane, x+" dòng đã được cập nhật");
+            
+            String query = "SELECT SUM(ThanhTien) FROM SYS.QLPK_TOATHUOC WHERE MaHD='"+mahd+"'";
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery(query);
+            while(rs.next()){
+                tienThuoc = rs.getLong(1);
+            }
+            
+            query = "UPDATE SYS.QLPK_TOATHUOC SET TINHTRANG=? WHERE MAHD=?";
+            PreparedStatement pre=conn.prepareStatement(query);
+            pre.setInt(1, 1);
+            pre.setInt(2, mahd);
+            pre.executeUpdate();            
+                       
+            query = "UPDATE SYS.QLPK_HOADON SET TIENKHAM=?, THANHTIEN=? WHERE MAHD=?";
+            PreparedStatement pre2 = conn.prepareStatement(query);
+            pre2.setLong(1, tienKham);
+            pre2.setLong(2, tienThuoc + tienKham);
+            pre2.setInt(3, mahd);
+            pre2.executeUpdate();
+            
+            int maThuoc = 0;
+            long thanhTien = 0;
+            String select = "SELECT MaThuoc, ThanhTien FROM SYS.QLPK_TOATHUOC WHERE MaHD='"+mahd+"'";
+            Statement stm2 = conn.createStatement();
+            ResultSet rs2 = stm2.executeQuery(select);
+            while(rs2.next()){
+                maThuoc = rs2.getInt(1);
+                thanhTien = rs2.getLong(2);
+                
+                query = "UPDATE SYS.QLPK_THUOC SET DOANHTHU=? WHERE MATHUOC=?";
+                PreparedStatement pre3 = conn.prepareStatement(query);
+                pre3.setLong(1, thanhTien);
+                pre3.setInt(2, maThuoc);
+                pre3.executeUpdate();
+            }
+            
+            JOptionPane.showMessageDialog(rootPane, "Ðã hoàn tất thanh toán");
 
-            //Sử dụng cho mô tả bất đồng thời oracle
-            String query="{call CAPNHATTINHTRANG(?)}";
-            CallableStatement castm = conn.prepareCall(query);
-            castm.setInt(1, mahd);
-            castm.execute();
+            // Sử dụng cho mô tả bất đồng thời oracle
+//            String query="{call CAPNHATTINHTRANG(?)}";
+//            CallableStatement castm = conn.prepareCall(query);
+//            castm.setInt(1, mahd);
+//            castm.execute();
             
             conn.close();
             this.dispose();
-        } catch (SQLException ex) {
+        } 
+        catch (SQLException ex) {
             JOptionPane.showMessageDialog(rootPane, "Lỗi cập nhập tình trạng toa thuốc!");
             Logger.getLogger(showToaThuocJDialog.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -16,7 +16,7 @@ import model.NhanVien;
 
 /**
  *
- * @author HP
+ * @author Phuong Lan, Khai Truong
  */
 public class showNhanVienDialog extends javax.swing.JDialog {
 
@@ -38,12 +38,12 @@ public class showNhanVienDialog extends javax.swing.JDialog {
             if(nv.getGioiTinh().equalsIgnoreCase("MALE")){
                 Male.setSelected(true);
                 Female.setSelected(false);
-                gioiTinh="MALE";
+                gioiTinh="Nam";
             }
             else{
                 Male.setSelected(false);
                 Female.setSelected(true);
-                gioiTinh="FEMALE";
+                gioiTinh="Nữ";
             }
                 
             
@@ -52,12 +52,12 @@ public class showNhanVienDialog extends javax.swing.JDialog {
             if(nv.getChucDanh().equalsIgnoreCase("NHAN VIEN")){
                 rbtNhanVien.setSelected(true);
                 rbtQuanLy.setSelected(false);
-                chucDanh="NHAN VIEN";
+                chucDanh="Nhan Vien";
             }
             else{
                 rbtNhanVien.setSelected(false);
                 rbtQuanLy.setSelected(true);
-                chucDanh="QUAN LY";
+                chucDanh="Quan Ly";
             }
             
             txtMaPhong.setText(nv.getMaPhong());
@@ -425,8 +425,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         if(rbtQuanLy.isSelected()){
             rbtNhanVien.setSelected(false);
-            //txtGioiTinh.setText("FEMALE");
-            chucDanh="QUAN LY";
+            chucDanh="Quan Ly";
         }
     }//GEN-LAST:event_rbtQuanLyActionPerformed
 
@@ -434,8 +433,7 @@ public class showNhanVienDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         if(rbtNhanVien.isSelected()){
             rbtQuanLy.setSelected(false);
-            //txtGioiTinh.setText("FEMALE");
-            chucDanh="NHAN VIEN";
+            chucDanh="Nhan Vien";
         }
     }//GEN-LAST:event_rbtNhanVienActionPerformed
 

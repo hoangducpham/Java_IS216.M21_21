@@ -7,7 +7,7 @@ package model;
 
 /**
  *
- * @author Admin
+ * @author Khai
  */
 public class Thuoc {
     private int maThuoc;
